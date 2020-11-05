@@ -21,6 +21,7 @@ jobs:
       with:
         java-version: 1.8
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: mvn -B package --file backend/heartbeat/pom.xml
     - name: Test with maven
+      run: cd backend/heartbeat
       run: mvn test
