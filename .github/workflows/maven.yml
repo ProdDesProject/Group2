@@ -23,5 +23,4 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file backend/heartbeat/pom.xml
     - name: Test with maven
-      run: cd backend/heartbeat
-      run: mvn test
+      run: cd backend/heartbeat && mvn run
