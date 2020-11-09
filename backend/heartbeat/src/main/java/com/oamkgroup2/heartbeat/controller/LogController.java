@@ -20,7 +20,7 @@ public class LogController {
 
     @GetMapping("/getall")
     List<Log> getAll() {
-        return logService.getAll();
+        return logService.getAlls();
     }
 
     @PostMapping("new/log")
