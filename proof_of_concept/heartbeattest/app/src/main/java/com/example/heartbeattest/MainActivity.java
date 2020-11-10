@@ -1,7 +1,5 @@
 package com.example.heartbeattest;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.Manifest;
 import android.os.Build;
 import android.os.Bundle;
@@ -9,25 +7,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import io.reactivex.CompletableObserver;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
+import androidx.appcompat.app.AppCompatActivity;
+
 import polar.com.sdk.api.PolarBleApi;
 import polar.com.sdk.api.PolarBleApiCallback;
 import polar.com.sdk.api.PolarBleApiDefaultImpl;
-import polar.com.sdk.api.model.PolarAccelerometerData;
 import polar.com.sdk.api.model.PolarDeviceInfo;
-import polar.com.sdk.api.model.PolarEcgData;
-import polar.com.sdk.api.model.PolarExerciseData;
-import polar.com.sdk.api.model.PolarExerciseEntry;
-import polar.com.sdk.api.model.PolarHrBroadcastData;
 import polar.com.sdk.api.model.PolarHrData;
-import polar.com.sdk.api.model.PolarOhrPPGData;
-import polar.com.sdk.api.model.PolarOhrPPIData;
-import polar.com.sdk.api.model.PolarSensorSetting;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,7 +40,11 @@ public class MainActivity extends AppCompatActivity {
         // e.g. PolarBleApiDefaultImpl.defaultImplementation(this, PolarBleApi.FEATURE_HR |
         // PolarBleApi.FEATURE_BATTERY_INFO);
         // batteryLevelReceived callback is invoked after connection
+        Log.d("MyApp", "Setting api... ");
         PolarBleApi api = PolarBleApiDefaultImpl.defaultImplementation(this, PolarBleApi.FEATURE_HR);
+        Log.d("MyApp", "Api set! ");
+
+        Log.d("MyApp", "Api after creation: " + api.toString());
 
         api.setApiCallback(new PolarBleApiCallback() {
             @Override
@@ -144,17 +134,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        api.backgroundEntered();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        api.foregroundEntered();
-    }
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+//        api.backgroundEntered();
+//    }
+//
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        Log.d("MyApp", "Back to foreground!");
+//        api.foregroundEntered();
+//    }
 
     @Override
     public void onDestroy() {
@@ -165,15 +156,18 @@ public class MainActivity extends AppCompatActivity {
     //TODO: make connect/disconnect button
     public void connectClicked(View view) {
         try {
+            Log.d("MyApp", "api when pressing button: " + api.toString());
             // check connection state
-            if ( this.isConnected == true && this.isConnecting == false) {
+            if ( this.isConnected == false && this.isConnecting == false) {
                 // based on that, connect/disconnect
                 api.connectToDevice(this.DEVICE_ID);
-            } else {
+            } else if (this.isConnected == true){
                 api.disconnectFromDevice(this.DEVICE_ID);
+            } else {
+                Log.d("MyApp", "Still connecting, refusing connect or disconnect action... ");
             }
         } catch (Exception e) {
-            Log.d("MyApp", "HR: " + e );
+            Log.d("MyApp", "Exception caught: " + e );
         }
 
     }
