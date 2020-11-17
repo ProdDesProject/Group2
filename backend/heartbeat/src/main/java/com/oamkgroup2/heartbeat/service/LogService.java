@@ -15,14 +15,14 @@ public class LogService {
     private LogRepository logRepository;
 
 	public List<Log> getAll() {
-        return logRepository.findAll();
+                return logRepository.findAll();
 	}
 
 	public Log newLog(String log) {
         //TODO: validate
-        Log newLog = new Log();
-        newLog.setContent(log);
-        return logRepository.save(newLog);
+                Log newLog = new Log();
+                newLog.setContent(log);
+                return logRepository.save(newLog);
 	}
     
 }
