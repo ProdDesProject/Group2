@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         // PolarBleApi.FEATURE_BATTERY_INFO);
         // batteryLevelReceived callback is invoked after connection
         Log.d("MyApp", "Setting api... ");
-        PolarBleApi api = PolarBleApiDefaultImpl.defaultImplementation(this, PolarBleApi.FEATURE_HR);
+        api = PolarBleApiDefaultImpl.defaultImplementation(this, PolarBleApi.FEATURE_HR);
         Log.d("MyApp", "Api set! ");
 
         Log.d("MyApp", "Api after creation: " + api.toString());
@@ -134,18 +134,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-//    @Override
-//    public void onPause() {
-//        super.onPause();
-//        api.backgroundEntered();
-//    }
-//
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        Log.d("MyApp", "Back to foreground!");
-//        api.foregroundEntered();
-//    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        try {
+            api.backgroundEntered();
+        } catch (Exception e) {
+            Log.d("MyApp", "Error: " + e);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("MyApp", "Back to foreground!");
+        try {
+            api.foregroundEntered();
+        } catch (Exception e) {
+            Log.d("MyApp", "Error: " + e);
+        }
+    }
 
     @Override
     public void onDestroy() {
@@ -153,10 +161,9 @@ public class MainActivity extends AppCompatActivity {
         api.shutDown();
     }
 
-    //TODO: make connect/disconnect button
     public void connectClicked(View view) {
         try {
-            Log.d("MyApp", "api when pressing button: " + api.toString());
+//            Log.d("MyApp", "api when pressing button: " + api.toString());
             // check connection state
             if ( this.isConnected == false && this.isConnecting == false) {
                 // based on that, connect/disconnect
