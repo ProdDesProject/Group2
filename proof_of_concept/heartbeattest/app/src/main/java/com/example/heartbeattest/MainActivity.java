@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -22,7 +23,11 @@ public class MainActivity extends AppCompatActivity {
     PolarBleApi api;
     String DEVICE_ID = "50924E2C";  //Note: SET OWN DEVICE ID OR USE SCAN FUNCTIONALITY
     int heartRate = 0;
+
+
     Button connectButton;
+    TextView hrField;
+
     boolean isConnected;
     boolean isConnecting;
 
@@ -31,8 +36,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         connectButton = (Button) findViewById(R.id.connectButton);
         connectButton.setText("Connect");
+        hrField = (TextView) findViewById((R.id.hrField));
+
         this.isConnected = false;
         this.isConnecting = false;
 
@@ -64,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void deviceConnecting(PolarDeviceInfo polarDeviceInfo) {
                 Log.d("MyApp", "CONNECTING: " + polarDeviceInfo.deviceId);
+                isConnected = false;
                 isConnecting = true;
                 connectButton.setClickable(false);
                 connectButton.setText("Connecting...");
@@ -110,7 +119,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void hrNotificationReceived(String identifier, PolarHrData data) {
                 Log.d("MyApp", "HR: " + data.hr);
-                heartRate = 0;
+                heartRate = data.hr;
+
+                hrField.setText("Heartrate: " + heartRate);
             }
 
             @Override
@@ -166,7 +177,6 @@ public class MainActivity extends AppCompatActivity {
 //            Log.d("MyApp", "api when pressing button: " + api.toString());
             // check connection state
             if ( this.isConnected == false && this.isConnecting == false) {
-                // based on that, connect/disconnect
                 api.connectToDevice(this.DEVICE_ID);
             } else if (this.isConnected == true){
                 api.disconnectFromDevice(this.DEVICE_ID);
