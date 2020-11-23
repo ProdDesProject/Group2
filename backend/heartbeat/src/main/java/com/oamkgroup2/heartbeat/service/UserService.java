@@ -19,6 +19,12 @@ public class UserService {
     private final Gson GSON = new Gson();
     private static final Logger LOG = Logger.getLogger(UserService.class.getName());
 
+    /**
+     * Creates a new user from a JSON string representation of a user.
+     * 
+     * @param JSON representation of User object.
+     * @return the created user.
+     */
     public User newUser(String stringUser) {
         // TODO: ensure no duplicate users can be created
         try {
@@ -31,6 +37,12 @@ public class UserService {
         }
     }
 
+    /**
+     * Find a user by its id. Returns null if no user is found.
+     * 
+     * @param the id to find.
+     * @return the user object.
+     */
     public User getUserById(long id) {
         try {
             Optional<User> user = userRepository.findById(id);
