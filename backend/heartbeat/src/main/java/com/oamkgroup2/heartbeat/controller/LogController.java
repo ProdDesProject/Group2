@@ -13,18 +13,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class LogController {
-    
+
     @Autowired
     private LogService logService;
 
-
     @GetMapping("/getall")
-    List<Log> getAll() {
+    public List<Log> getAll() {
         return logService.getAll();
     }
 
     @PostMapping("new/log")
-    Log newLog(@RequestBody String log){
+    public Log newLog(@RequestBody String log) {
         return logService.newLog(log);
     }
 

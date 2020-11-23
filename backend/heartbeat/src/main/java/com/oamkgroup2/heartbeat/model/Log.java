@@ -1,5 +1,7 @@
 package com.oamkgroup2.heartbeat.model;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -9,18 +11,20 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "Heartbeat_logs")
 public class Log {
-    
-    @Id 
-    @GeneratedValue(strategy=GenerationType.AUTO) 
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
-    String content;
+    Date date;
+    int heartRate;
 
+    public Log() {
+    }
 
-    public Log(){}
-
-    Log(long id, String content){
+    Log(long id, Date date, int heartRate) {
         this.id = id;
-        this.content = content;
+        this.date = date;
+        this.heartRate = heartRate;
     }
 
     public Long getId() {
@@ -31,12 +35,20 @@ public class Log {
         this.id = id;
     }
 
-    public String getContent() {
-        return content;
+    public Date getDate() {
+        return date;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public int getHeartRate() {
+        return heartRate;
+    }
+
+    public void setHeartRate(int heartRate) {
+        this.heartRate = heartRate;
     }
 
 }
