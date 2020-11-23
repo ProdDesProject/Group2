@@ -3,10 +3,10 @@ package com.oamkgroup2.heartbeat.model;
 public class NightResult {
 
     Long userId;
-    String shape;
+    NightResult shape;
     Log[] logs;
 
-    public NightResult(Long userId, String shape, Log[] logs) {
+    public NightResult(Long userId, NightResult shape, Log[] logs) {
         this.userId = userId;
         this.shape = shape;
         this.logs = logs;
@@ -23,11 +23,11 @@ public class NightResult {
         this.userId = userId;
     }
 
-    public String getShape() {
+    public NightResult getShape() {
         return shape;
     }
 
-    public void setShape(String shape) {
+    public void setShape(NightResult shape) {
         this.shape = shape;
     }
 
