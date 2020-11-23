@@ -1,5 +1,6 @@
 package com.oamkgroup2.heartbeat.service;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -30,6 +31,16 @@ public class LogService {
         } catch (Exception e) {
             LOG.warning(e.getLocalizedMessage());
             return null;
+        }
+    }
+
+    public Log[] newBatch(String stringLogs) {
+        try {
+            List<Log> logs = Arrays.asList(GSON.fromJson(stringLogs, Log[].class));
+            return logRepository.saveAll(logs).toArray(new Log[0]);
+        } catch (Exception e) {
+            LOG.warning(e.getLocalizedMessage());
+            return new Log[0];
         }
     }
 

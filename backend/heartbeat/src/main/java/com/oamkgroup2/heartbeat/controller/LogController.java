@@ -29,4 +29,9 @@ public class LogController {
         return logService.newLog(log);
     }
 
+    @PostMapping("new/batch")
+    public Log[] newBatch(@RequestBody String logs) {
+        return logService.newBatch(logs);
+    }
+
 }
