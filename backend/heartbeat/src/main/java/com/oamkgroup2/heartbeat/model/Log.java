@@ -2,13 +2,12 @@ package com.oamkgroup2.heartbeat.model;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  * Class that represents a heartrate/min for a specific time for a specific
@@ -28,22 +27,24 @@ public class Log {
     /**
      * The date and time for this specific log.
      */
-    @Temporal(TemporalType.TIMESTAMP)
     LocalDateTime date;
 
     /**
      * The heartRate per minute for this specific time.
      */
+    @Column(name = "heart_rate")
     int heartRate;
 
     /**
      * The user this log belongs to.
      */
+    @Column(name = "user_id")
     long userId;
 
     /**
      * The night this log belongs to. Every sleepsession represents one night.
      */
+    @Column(name = "sleep_session")
     long sleepSession;
 
     public Log() {

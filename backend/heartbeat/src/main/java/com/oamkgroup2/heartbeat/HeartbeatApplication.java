@@ -21,7 +21,7 @@ public class HeartbeatApplication {
 	}
 
 	@Bean
-	public CommandLineRunner demo(UserRepository repository) {
+	public CommandLineRunner persistUser(UserRepository repository) {
 		return args -> {
 			User user = new User();
 			user.setAge(25);
@@ -33,7 +33,7 @@ public class HeartbeatApplication {
 	}
 
 	@Bean
-	public CommandLineRunner demo(LogRepository repository) {
+	public CommandLineRunner persistLogs(LogRepository repository) {
 		return args -> {
 			Log log = new Log();
 			log.setSleepSession(0);
