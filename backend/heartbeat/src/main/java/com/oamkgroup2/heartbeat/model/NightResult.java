@@ -1,15 +1,22 @@
 package com.oamkgroup2.heartbeat.model;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+
 public class NightResult {
 
     Long userId;
-    NightResult shape;
+    ShapeResult shape;
     Log[] logs;
+    LocalDate nightStartDate;
 
-    public NightResult(Long userId, NightResult shape, Log[] logs) {
+    public NightResult(Long userId, ShapeResult shape, Log[] logs) {
         this.userId = userId;
         this.shape = shape;
         this.logs = logs;
+        if (this.logs.length > 0) {
+            this.nightStartDate = logs[0].getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        }
     }
 
     public NightResult() {
@@ -23,11 +30,11 @@ public class NightResult {
         this.userId = userId;
     }
 
-    public NightResult getShape() {
+    public ShapeResult getShape() {
         return shape;
     }
 
-    public void setShape(NightResult shape) {
+    public void setShape(ShapeResult shape) {
         this.shape = shape;
     }
 

@@ -1,7 +1,5 @@
 package com.oamkgroup2.heartbeat.model;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -11,7 +9,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 
 @Entity
 @Table(name = "Heartbeat_logs")
