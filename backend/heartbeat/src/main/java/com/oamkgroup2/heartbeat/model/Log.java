@@ -25,15 +25,17 @@ public class Log {
     Date date;
     int heartRate;
     long userId;
+    long sleepSession;
 
     public Log() {
     }
 
-    Log(long id, Date date, int heartRate, long userId) {
+    Log(long id, Date date, int heartRate, long userId, long sleepSession) {
         this.id = id;
         this.date = date;
         this.heartRate = heartRate;
         this.userId = userId;
+        this.sleepSession = sleepSession;
     }
 
     public Long getId() {
@@ -66,6 +68,14 @@ public class Log {
 
     public void setUserId(long userId) {
         this.userId = userId;
+    }
+
+    public long getSleepSession() {
+        return sleepSession;
+    }
+
+    public void setSleepSession(long sleepSession) {
+        this.sleepSession = sleepSession;
     }
 
 }
