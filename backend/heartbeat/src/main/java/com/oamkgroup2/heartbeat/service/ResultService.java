@@ -42,4 +42,11 @@ public class ResultService {
         }
     }
 
+    /**
+     * Return a set of testdata.
+     */
+    public NightResult getTestResult() {
+        throw new UnsupportedOperationException();
+    }
+
 }

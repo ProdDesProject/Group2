@@ -27,4 +27,13 @@ public class ResultController {
         return this.resultService.getLatestResult(userId);
     }
 
+    /**
+     * Test method that does the same as getUserById but returns a default set of
+     * testdata.
+     */
+    @GetMapping("/get/test")
+    public NightResult getTestResult() {
+        return this.resultService.getTestResult();
+    }
+
 }
