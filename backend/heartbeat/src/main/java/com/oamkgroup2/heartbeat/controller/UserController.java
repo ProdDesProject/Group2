@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * API controller for handling requests about users.
+ */
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -17,11 +20,23 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    /**
+     * Get details about a specific user.
+     * 
+     * @param id the user to get.
+     * @return JSON representation of the user object.
+     */
     @GetMapping("/get")
     public User getUserById(@RequestBody long id) {
         return this.userService.getUserById(id);
     }
 
+    /**
+     * Persist a new user.
+     * 
+     * @param user JSON representation of the user to save.
+     * @return the persisted user.
+     */
     @PostMapping("/new")
     public User createNewUser(@RequestBody String user) {
         return this.userService.newUser(user);

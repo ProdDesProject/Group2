@@ -16,13 +16,17 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * Tool for converting to and from JSON and POJO objects.
+     */
     private final Gson GSON = new Gson();
     private static final Logger LOG = Logger.getLogger(UserService.class.getName());
 
     /**
-     * Creates a new user from a JSON string representation of a user.
+     * Creates a new user from a JSON string representation of a user and persist
+     * it.
      * 
-     * @param JSON representation of User object.
+     * @param stringUser JSON representation of User object.
      * @return the created user.
      */
     public User newUser(String stringUser) {

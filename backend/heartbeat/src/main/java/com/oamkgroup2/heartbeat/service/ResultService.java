@@ -2,15 +2,12 @@ package com.oamkgroup2.heartbeat.service;
 
 import java.util.logging.Logger;
 
-import com.google.gson.Gson;
 import com.oamkgroup2.heartbeat.model.NightResult;
 import com.oamkgroup2.heartbeat.model.ShapeResult;
 import com.oamkgroup2.heartbeat.repository.LogRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import net.bytebuddy.dynamic.loading.PackageDefinitionStrategy.Definition.Undefined;
 
 import com.oamkgroup2.heartbeat.model.Log;
 
@@ -20,9 +17,15 @@ public class ResultService {
     @Autowired
     private LogRepository logRepository;
 
-    private final Gson GSON = new Gson();
     private static final Logger LOG = Logger.getLogger(ResultService.class.getName());
 
+    /**
+     * Get the NightResult for the last night of a specific user.
+     * 
+     * @param userId the user to get the result for.
+     * @return NightResult representing the heartrate logs and analyzed graphed
+     *         shape of those logs.
+     */
     public NightResult getLatestResult(long userId) {
         NightResult result = new NightResult();
         result.setUserId(userId);

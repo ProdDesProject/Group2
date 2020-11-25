@@ -11,19 +11,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.logging.Logger;
 
+/**
+ * Service that provides tools for saving and getting logs.
+ */
 @Service
 public class LogService {
 
     @Autowired
     private LogRepository logRepository;
 
+    /**
+     * Tool for converting to and from JSON and POJO objects.
+     */
     private final Gson GSON = new Gson();
     private static final Logger LOG = Logger.getLogger(LogService.class.getName());
 
+    /**
+     * Gets all logs in the database. Only for testing. TODO: remove this for
+     * production.
+     */
     public List<Log> getAll() {
         return logRepository.findAll();
     }
 
+    /**
+     * Create a new log from a JSON representation of a log and persist it.
+     * 
+     * @param stringLog JSON representation of a log.
+     */
     public Log newLog(String stringLog) {
         try {
             Log newLog = GSON.fromJson(stringLog, Log.class);
@@ -34,6 +49,12 @@ public class LogService {
         }
     }
 
+    /**
+     * Saves a batch of logs from a JSON representation of an array of logs and
+     * persist them as seperate logs.
+     * 
+     * @param stringLog JSON representation of an array of logs.
+     */
     public Log[] newBatch(String stringLogs) {
         try {
             List<Log> logs = Arrays.asList(GSON.fromJson(stringLogs, Log[].class));

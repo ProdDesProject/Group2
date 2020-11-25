@@ -6,16 +6,23 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ * Class that represents a user.
+ */
 @Entity
 @Table(name = "users")
 public class User {
 
+    /**
+     * The userId.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
 
     String name;
     int age;
+
     // TODO: add profile pic
 
     public User() {

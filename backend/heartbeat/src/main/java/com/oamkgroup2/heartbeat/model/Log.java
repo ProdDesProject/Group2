@@ -1,6 +1,6 @@
 package com.oamkgroup2.heartbeat.model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,24 +10,46 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+/**
+ * Class that represents a heartrate/min for a specific time for a specific
+ * user.
+ */
 @Entity
 @Table(name = "Heartbeat_logs")
 public class Log {
 
+    /**
+     * The log id.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
 
+    /**
+     * The date and time for this specific log.
+     */
     @Temporal(TemporalType.TIMESTAMP)
-    Date date;
+    LocalDateTime date;
+
+    /**
+     * The heartRate per minute for this specific time.
+     */
     int heartRate;
+
+    /**
+     * The user this log belongs to.
+     */
     long userId;
+
+    /**
+     * The night this log belongs to. Every sleepsession represents one night.
+     */
     long sleepSession;
 
     public Log() {
     }
 
-    Log(long id, Date date, int heartRate, long userId, long sleepSession) {
+    Log(long id, LocalDateTime date, int heartRate, long userId, long sleepSession) {
         this.id = id;
         this.date = date;
         this.heartRate = heartRate;
@@ -43,11 +65,11 @@ public class Log {
         this.id = id;
     }
 
-    public Date getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 
