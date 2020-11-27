@@ -43,7 +43,6 @@ public class HeartbeatApplication {
 				time = time.plusMinutes((long) i);
 				log.setDate(time);
 				log.setHeartRate(i);
-				log.setId((long) i);
 
 				repository.save(log);
 			}

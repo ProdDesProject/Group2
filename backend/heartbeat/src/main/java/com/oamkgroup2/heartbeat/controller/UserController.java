@@ -1,9 +1,12 @@
 package com.oamkgroup2.heartbeat.controller;
 
+import javax.validation.Valid;
+
 import com.oamkgroup2.heartbeat.model.User;
 import com.oamkgroup2.heartbeat.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  * API controller for handling requests about users.
  */
 @RestController
+@Validated
 @RequestMapping("/user")
 public class UserController {
 
@@ -38,7 +42,7 @@ public class UserController {
      * @return the persisted user.
      */
     @PostMapping("/new")
-    public User createNewUser(@RequestBody String user) {
+    public User createNewUser(@Valid @RequestBody User user) {
         return this.userService.newUser(user);
     }
 

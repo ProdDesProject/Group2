@@ -2,10 +2,13 @@ package com.oamkgroup2.heartbeat.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import com.oamkgroup2.heartbeat.service.LogService;
 import com.oamkgroup2.heartbeat.model.Log;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * API controller for handling requests about logs.
  */
+@Validated
 @RestController
 @RequestMapping("/logs")
 public class LogController {
@@ -36,7 +40,7 @@ public class LogController {
      * @param log JSON representation of a Log object.
      */
     @PostMapping("new/log")
-    public Log newLog(@RequestBody String log) {
+    public Log newLog(@Valid @RequestBody Log log) {
         return logService.newLog(log);
     }
 
@@ -46,7 +50,7 @@ public class LogController {
      * @param logs a JSON representation of an array of logs.
      */
     @PostMapping("new/batch")
-    public Log[] newBatch(@RequestBody String logs) {
+    public Log[] newBatch(@Valid @RequestBody Log[] logs) {
         return logService.newBatch(logs);
     }
 

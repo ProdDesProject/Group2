@@ -9,12 +9,17 @@ import com.oamkgroup2.heartbeat.repository.LogRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+
 import java.util.logging.Logger;
+
+import javax.validation.Valid;
 
 /**
  * Service that provides tools for saving and getting logs.
  */
 @Service
+@Validated
 public class LogService {
 
     @Autowired
@@ -39,14 +44,8 @@ public class LogService {
      * 
      * @param stringLog JSON representation of a log.
      */
-    public Log newLog(String stringLog) {
-        try {
-            Log newLog = GSON.fromJson(stringLog, Log.class);
-            return logRepository.save(newLog);
-        } catch (Exception e) {
-            LOG.warning(e.getLocalizedMessage());
-            return null;
-        }
+    public Log newLog(@Valid Log log) {
+        return logRepository.save(log);
     }
 
     /**
@@ -55,12 +54,12 @@ public class LogService {
      * 
      * @param stringLog JSON representation of an array of logs.
      */
-    public Log[] newBatch(String stringLogs) {
+    public Log[] newBatch(@Valid Log[] logs) {
         try {
-            List<Log> logs = Arrays.asList(GSON.fromJson(stringLogs, Log[].class));
-            return logRepository.saveAll(logs).toArray(new Log[0]);
+            return logRepository.saveAll(Arrays.asList(logs)).toArray(new Log[0]);
         } catch (Exception e) {
             LOG.warning(e.getLocalizedMessage());
+            // TODO: fix error handling
             return new Log[0];
         }
     }

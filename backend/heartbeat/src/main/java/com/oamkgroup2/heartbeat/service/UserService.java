@@ -6,11 +6,15 @@ import com.oamkgroup2.heartbeat.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.Optional;
 import java.util.logging.Logger;
 
+import javax.validation.Valid;
+
 @Service
+@Validated
 public class UserService {
 
     @Autowired
@@ -29,11 +33,10 @@ public class UserService {
      * @param stringUser JSON representation of User object.
      * @return the created user.
      */
-    public User newUser(String stringUser) {
+    public User newUser(@Valid User user) {
         // TODO: ensure no duplicate users can be created
         try {
-            User newUser = GSON.fromJson(stringUser, User.class);
-            return userRepository.save(newUser);
+            return userRepository.save(user);
         } catch (Exception e) {
             LOG.warning(e.getLocalizedMessage());
             // TODO: fix error handling
