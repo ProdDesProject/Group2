@@ -151,25 +151,39 @@ public class Log {
      * Method for comparing Log objects. Discounts the Log ID, since this only gets
      * set when persisted.
      */
-    public boolean equalsWithoutId(Log log) {
+    public boolean equalsWithoutId(Object objectLog) {
+        try {
+            if (objectLog.getClass() != Log.class) {
+                return false;
+            } else {
+                Log log = (Log) objectLog;
+                if (this.date != log.getDate()) {
+                    return false;
+                }
 
-        if (this.date != log.getDate()) {
+                if (this.heartRate != log.getHeartRate()) {
+                    return false;
+                }
+
+                if (this.userId != log.getUserId()) {
+                    return false;
+                }
+
+                if (this.sleepSession != log.getSleepSession()) {
+                    return false;
+                }
+
+                return true;
+            }
+        } catch (NullPointerException e) {
             return false;
         }
+    }
 
-        if (this.heartRate != log.getHeartRate()) {
-            return false;
-        }
-
-        if (this.userId != log.getUserId()) {
-            return false;
-        }
-
-        if (this.sleepSession != log.getSleepSession()) {
-            return false;
-        }
-
-        return true;
+    @Override
+    public String toString() {
+        return String.format("Log: id: %s, date: %s, heartrate: %d, userid: %d, sleepsession: %d.", this.id,
+                this.date.toString(), this.heartRate, this.userId, this.sleepSession);
     }
 
 }

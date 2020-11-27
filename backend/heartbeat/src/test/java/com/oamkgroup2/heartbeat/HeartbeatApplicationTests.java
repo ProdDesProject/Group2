@@ -31,7 +31,6 @@ class HeartbeatApplicationTests {
 		assertThat(logController).isNotNull();
 		assertThat(resultController).isNotNull();
 		assertThat(userController).isNotNull();
-		LOG.info("contextLoads complete! Controllers working.");
 	}
 
 }
