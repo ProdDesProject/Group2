@@ -108,4 +108,68 @@ public class Log {
         this.sleepSession = sleepSession;
     }
 
+    /**
+     * Method for comparing Logs. Does include Log ID in comparison.
+     */
+    @Override
+    public boolean equals(Object logObject) {
+        try {
+            if (logObject.getClass() != Log.class) {
+                return false;
+            } else {
+                Log log = (Log) logObject;
+
+                if (this.id != log.getId()) {
+                    return false;
+                }
+
+                if (this.date != log.getDate()) {
+                    return false;
+                }
+
+                if (this.heartRate != log.getHeartRate()) {
+                    return false;
+                }
+
+                if (this.userId != log.getUserId()) {
+                    return false;
+                }
+
+                if (this.sleepSession != log.getSleepSession()) {
+                    return false;
+                }
+
+                return true;
+            }
+
+        } catch (NullPointerException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Method for comparing Log objects. Discounts the Log ID, since this only gets
+     * set when persisted.
+     */
+    public boolean equalsWithoutId(Log log) {
+
+        if (this.date != log.getDate()) {
+            return false;
+        }
+
+        if (this.heartRate != log.getHeartRate()) {
+            return false;
+        }
+
+        if (this.userId != log.getUserId()) {
+            return false;
+        }
+
+        if (this.sleepSession != log.getSleepSession()) {
+            return false;
+        }
+
+        return true;
+    }
+
 }
