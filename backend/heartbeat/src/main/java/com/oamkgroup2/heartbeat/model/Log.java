@@ -8,6 +8,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 /**
  * Class that represents a heartrate/min for a specific time for a specific
@@ -27,30 +29,37 @@ public class Log {
     /**
      * The date and time for this specific log.
      */
+    @NotNull
     LocalDateTime date;
 
     /**
      * The heartRate per minute for this specific time.
      */
+    @Min(0)
+    @NotNull
     @Column(name = "heart_rate")
     int heartRate;
 
     /**
      * The user this log belongs to.
      */
+    @Min(0)
+    @NotNull
     @Column(name = "user_id")
     long userId;
 
     /**
      * The night this log belongs to. Every sleepsession represents one night.
      */
+    @Min(0)
+    @NotNull
     @Column(name = "sleep_session")
     long sleepSession;
 
     public Log() {
     }
 
-    Log(long id, LocalDateTime date, int heartRate, long userId, long sleepSession) {
+    public Log(long id, LocalDateTime date, int heartRate, long userId, long sleepSession) {
         this.id = id;
         this.date = date;
         this.heartRate = heartRate;

@@ -3,6 +3,9 @@ package com.oamkgroup2.heartbeat.model;
 import java.time.LocalDate;
 import java.time.Month;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
 /**
  * Class that represents a specific night for a user. Contains HeartrateLogs,
  * the ShapeResult and the night the sleep belongs to.
@@ -12,6 +15,8 @@ public class NightResult {
     /**
      * The user this NightResult belongs to.
      */
+    @NotNull
+    @Min(0)
     Long userId;
 
     /**
@@ -23,6 +28,7 @@ public class NightResult {
     /**
      * The Heartrate logs for this night.
      */
+    @NotNull
     Log[] logs;
 
     /**
