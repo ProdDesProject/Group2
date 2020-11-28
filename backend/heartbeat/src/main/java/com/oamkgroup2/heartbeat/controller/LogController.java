@@ -8,6 +8,8 @@ import com.oamkgroup2.heartbeat.service.LogService;
 import com.oamkgroup2.heartbeat.model.Log;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,8 +32,8 @@ public class LogController {
      * Get all logs. Only for testing purposes
      */
     @GetMapping("/getall")
-    public List<Log> getAll() {
-        return logService.getAll();
+    public ResponseEntity<List<Log>> getAll() {
+        return new ResponseEntity<>(logService.getAll(), HttpStatus.OK);
     }
 
     /**
@@ -40,8 +42,8 @@ public class LogController {
      * @param log JSON representation of a Log object.
      */
     @PostMapping("new/log")
-    public Log newLog(@Valid @RequestBody Log log) {
-        return logService.newLog(log);
+    public ResponseEntity<Log> newLog(@Valid @RequestBody Log log) {
+        return new ResponseEntity<>(logService.newLog(log), HttpStatus.OK);
     }
 
     /**
@@ -50,8 +52,8 @@ public class LogController {
      * @param logs a JSON representation of an array of logs.
      */
     @PostMapping("new/batch")
-    public Log[] newBatch(@Valid @RequestBody Log[] logs) {
-        return logService.newBatch(logs);
+    public ResponseEntity<Log[]> newBatch(@Valid @RequestBody Log[] logs) {
+        return new ResponseEntity<>(logService.newBatch(logs), HttpStatus.OK);
     }
 
 }

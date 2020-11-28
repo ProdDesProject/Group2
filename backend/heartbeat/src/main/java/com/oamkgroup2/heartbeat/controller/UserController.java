@@ -6,6 +6,8 @@ import com.oamkgroup2.heartbeat.model.User;
 import com.oamkgroup2.heartbeat.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,8 +33,8 @@ public class UserController {
      * @return JSON representation of the user object.
      */
     @GetMapping("/get")
-    public User getUserById(@RequestBody long id) {
-        return this.userService.getUserById(id);
+    public ResponseEntity<User> getUserById(@RequestBody long id) {
+        return new ResponseEntity<>(this.userService.getUserById(id), HttpStatus.OK);
     }
 
     /**
@@ -42,8 +44,8 @@ public class UserController {
      * @return the persisted user.
      */
     @PostMapping("/new")
-    public User createNewUser(@Valid @RequestBody User user) {
-        return this.userService.newUser(user);
+    public ResponseEntity<User> createNewUser(@Valid @RequestBody User user) {
+        return new ResponseEntity<>(this.userService.newUser(user), HttpStatus.OK);
     }
 
 }
