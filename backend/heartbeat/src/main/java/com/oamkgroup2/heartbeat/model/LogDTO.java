@@ -1,96 +1,58 @@
 package com.oamkgroup2.heartbeat.model;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
  * Class that represents a heartrate/min for a specific time for a specific
  * user.
  */
-@Entity
-@Table(name = "Heartbeat_logs")
-public class Log {
+public class LogDTO {
 
     /**
-     * The log id.
+     * The date and time for this specific log, in miliseconds since epoch.
      */
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    Long id;
-
-    /**
-     * The date and time for this specific log.
-     */
+    @Min(0)
     @NotNull
-    LocalDateTime date;
+    private long epochDate;
 
     /**
      * The heartRate per minute for this specific time.
      */
     @Min(0)
     @NotNull
-    @Column(name = "heart_rate")
-    int heartRate;
+    private int heartRate;
 
     /**
      * The user this log belongs to.
      */
     @Min(0)
     @NotNull
-    @Column(name = "user_id")
-    long userId;
+    private long userId;
 
     /**
      * The night this log belongs to. Every sleepsession represents one night.
      */
     @Min(0)
     @NotNull
-    @Column(name = "sleep_session")
-    long sleepSession;
+    private long sleepSession;
 
-    public Log() {
+    public LogDTO() {
     }
 
-    public Log(LogDTO dto) {
-        this.date = LocalDateTime.ofInstant(Instant.ofEpochMilli(dto.getEpochDate()), ZoneId.systemDefault());
-        this.heartRate = dto.getHeartRate();
-        this.userId = dto.getUserId();
-        this.sleepSession = dto.getSleepSession();
-    }
-
-    public Log(long id, LocalDateTime date, int heartRate, long userId, long sleepSession) {
-        this.id = id;
-        this.date = date;
+    public LogDTO(long epochDate, int heartRate, long userId, long sleepSession) {
+        this.epochDate = epochDate;
         this.heartRate = heartRate;
         this.userId = userId;
         this.sleepSession = sleepSession;
     }
 
-    public Long getId() {
-        return id;
+    public long getEpochDate() {
+        return this.epochDate;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public LocalDateTime getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDateTime date) {
-        this.date = date;
+    public void setDate(long epochDate) {
+        this.epochDate = epochDate;
     }
 
     public int getHeartRate() {
@@ -123,16 +85,12 @@ public class Log {
     @Override
     public boolean equals(Object logObject) {
         try {
-            if (logObject.getClass() != Log.class) {
+            if (logObject.getClass() != LogDTO.class) {
                 return false;
             } else {
-                Log log = (Log) logObject;
+                LogDTO log = (LogDTO) logObject;
 
-                if (this.id != log.getId()) {
-                    return false;
-                }
-
-                if (this.date != log.getDate()) {
+                if (this.epochDate != log.getEpochDate()) {
                     return false;
                 }
 
@@ -165,8 +123,8 @@ public class Log {
             if (objectLog.getClass() != Log.class) {
                 return false;
             } else {
-                Log log = (Log) objectLog;
-                if (this.date != log.getDate()) {
+                LogDTO log = (LogDTO) objectLog;
+                if (this.epochDate != log.getEpochDate()) {
                     return false;
                 }
 
@@ -191,8 +149,8 @@ public class Log {
 
     @Override
     public String toString() {
-        return String.format("Log: id: %s, date: %s, heartrate: %d, userid: %d, sleepsession: %d.", this.id,
-                this.date.toString(), this.heartRate, this.userId, this.sleepSession);
+        return String.format("EpochDate: %d, heartrate: %d, userid: %d, sleepsession: %d.", this.epochDate,
+                this.heartRate, this.userId, this.sleepSession);
     }
 
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.google.gson.Gson;
 import com.oamkgroup2.heartbeat.model.Log;
+import com.oamkgroup2.heartbeat.model.LogDTO;
 import com.oamkgroup2.heartbeat.repository.LogRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -44,7 +46,8 @@ public class LogService {
      * 
      * @param stringLog JSON representation of a log.
      */
-    public Log newLog(@Valid Log log) {
+    public Log newLog(@Valid LogDTO logDTO) {
+        Log log = new Log(logDTO);
         return logRepository.save(log);
     }
 
@@ -54,9 +57,10 @@ public class LogService {
      * 
      * @param stringLog JSON representation of an array of logs.
      */
-    public Log[] newBatch(@Valid Log[] logs) {
+    public Log[] newBatch(@Valid LogDTO[] logDTOs) {
         try {
-            return logRepository.saveAll(Arrays.asList(logs)).toArray(new Log[0]);
+            List<Log> logs = Arrays.stream(logDTOs).map(dto -> new Log(dto)).collect(Collectors.toList());
+            return logRepository.saveAll(logs).toArray(new Log[0]);
         } catch (Exception e) {
             LOG.warning(e.getLocalizedMessage());
             // TODO: fix error handling

@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import com.oamkgroup2.heartbeat.service.LogService;
 import com.oamkgroup2.heartbeat.model.Log;
+import com.oamkgroup2.heartbeat.model.LogDTO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,11 +40,11 @@ public class LogController {
     /**
      * Persist a new log in the database. //TODO: check if ID is needed.
      * 
-     * @param log JSON representation of a Log object.
+     * @param logDTO JSON representation of a Log object.
      */
     @PostMapping("new/log")
-    public ResponseEntity<Log> newLog(@Valid @RequestBody Log log) {
-        return new ResponseEntity<>(logService.newLog(log), HttpStatus.OK);
+    public ResponseEntity<Log> newLog(@Valid @RequestBody LogDTO logDTO) {
+        return new ResponseEntity<>(logService.newLog(logDTO), HttpStatus.OK);
     }
 
     /**
@@ -52,7 +53,7 @@ public class LogController {
      * @param logs a JSON representation of an array of logs.
      */
     @PostMapping("new/batch")
-    public ResponseEntity<Log[]> newBatch(@Valid @RequestBody Log[] logs) {
+    public ResponseEntity<Log[]> newBatch(@Valid @RequestBody LogDTO[] logs) {
         return new ResponseEntity<>(logService.newBatch(logs), HttpStatus.OK);
     }
 
