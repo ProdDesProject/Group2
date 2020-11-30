@@ -11,8 +11,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * Class that represents a heartrate/min for a specific time for a specific
@@ -33,6 +34,7 @@ public class Log {
      * The date and time for this specific log.
      */
     @NotNull
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     LocalDateTime date;
 
     /**
@@ -40,6 +42,7 @@ public class Log {
      */
     @Min(0)
     @NotNull
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @Column(name = "heart_rate")
     int heartRate;
 
@@ -48,6 +51,7 @@ public class Log {
      */
     @Min(0)
     @NotNull
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @Column(name = "user_id")
     long userId;
 
@@ -56,6 +60,7 @@ public class Log {
      */
     @Min(0)
     @NotNull
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @Column(name = "sleep_session")
     long sleepSession;
 

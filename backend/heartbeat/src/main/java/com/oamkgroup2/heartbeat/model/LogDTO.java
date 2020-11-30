@@ -3,6 +3,8 @@ package com.oamkgroup2.heartbeat.model;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * Class that represents a heartrate/min for a specific time for a specific
  * user.
@@ -14,6 +16,7 @@ public class LogDTO {
      */
     @Min(0)
     @NotNull
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private long epochDate;
 
     /**
@@ -21,6 +24,7 @@ public class LogDTO {
      */
     @Min(0)
     @NotNull
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private int heartRate;
 
     /**
@@ -28,6 +32,7 @@ public class LogDTO {
      */
     @Min(0)
     @NotNull
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private long userId;
 
     /**
@@ -35,6 +40,7 @@ public class LogDTO {
      */
     @Min(0)
     @NotNull
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private long sleepSession;
 
     public LogDTO() {
