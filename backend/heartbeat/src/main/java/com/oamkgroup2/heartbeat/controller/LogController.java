@@ -5,6 +5,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import com.oamkgroup2.heartbeat.service.LogService;
+import com.oamkgroup2.heartbeat.exception.EntityNotFoundException;
 import com.oamkgroup2.heartbeat.model.Log;
 import com.oamkgroup2.heartbeat.model.LogDTO;
 
@@ -35,6 +36,17 @@ public class LogController {
     @GetMapping("/getall")
     public ResponseEntity<List<Log>> getAll() {
         return new ResponseEntity<>(logService.getAll(), HttpStatus.OK);
+    }
+
+    /**
+     * Get the latest +1 sleepsession. Represents one night's sleep, and is used to
+     * find all logs for one night.
+     * 
+     * @throws EntityNotFoundException
+     */
+    @GetMapping("/sleepsession")
+    public ResponseEntity<Long> getLatestSleepSession(@RequestBody Long userId) throws EntityNotFoundException {
+        return new ResponseEntity<>(logService.getLatestSleepSession(userId), HttpStatus.OK);
     }
 
     /**

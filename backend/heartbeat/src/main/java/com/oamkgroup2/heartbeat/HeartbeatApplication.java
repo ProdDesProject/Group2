@@ -35,14 +35,14 @@ public class HeartbeatApplication {
 	@Bean
 	public CommandLineRunner persistLogs(LogRepository repository) {
 		return args -> {
-			Log log = new Log();
-			log.setSleepSession(0);
-			log.setUserId(0L);
-			LocalDateTime time = LocalDateTime.of(2020, Month.NOVEMBER, 25, 2, 0, 0);
 			for (int i = 0; i < 60; i++) {
+				Log log = new Log();
+				log.setUserId(1L);
+				LocalDateTime time = LocalDateTime.of(2020, Month.NOVEMBER, 25, 2, 0, 0);
 				time = time.plusMinutes((long) i);
 				log.setDate(time);
 				log.setHeartRate(i);
+				log.setSleepSession(i);
 
 				repository.save(log);
 			}

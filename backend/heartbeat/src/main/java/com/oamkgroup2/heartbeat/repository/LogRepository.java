@@ -13,4 +13,7 @@ public interface LogRepository extends JpaRepository<Log, Long> {
             + " WHERE l.user_id = :user AND l.sleep_session IN (SELECT max(sleep_session) FROM Heartbeat_logs h WHERE h.user_id = :user)", nativeQuery = true)
     Log[] findLastNightLogsForUser(@Param("user") long user);
 
+    @Query(value = "SELECT sleep_session FROM Heartbeat_logs l WHERE l.user_id = :user ORDER BY sleep_session DESC LIMIT 3;", nativeQuery = true)
+    long[] findTopSleepSessionsForUser(@Param("user") long user);
+
 }
