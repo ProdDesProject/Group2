@@ -38,7 +38,7 @@ public class LogController {
     }
 
     /**
-     * Persist a new log in the database. //TODO: check if ID is needed.
+     * Persist a new log in the database.
      * 
      * @param logDTO JSON representation of a Log object.
      */

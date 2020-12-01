@@ -3,7 +3,6 @@ package com.oamkgroup2.heartbeat.service;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.gson.Gson;
 import com.oamkgroup2.heartbeat.model.Log;
 import com.oamkgroup2.heartbeat.model.LogDTO;
 import com.oamkgroup2.heartbeat.repository.LogRepository;
@@ -27,10 +26,6 @@ public class LogService {
     @Autowired
     private LogRepository logRepository;
 
-    /**
-     * Tool for converting to and from JSON and POJO objects.
-     */
-    private final Gson GSON = new Gson();
     private static final Logger LOG = Logger.getLogger(LogService.class.getName());
 
     /**
@@ -58,14 +53,8 @@ public class LogService {
      * @param stringLog JSON representation of an array of logs.
      */
     public Log[] newBatch(@Valid LogDTO[] logDTOs) {
-        try {
-            List<Log> logs = Arrays.stream(logDTOs).map(dto -> new Log(dto)).collect(Collectors.toList());
-            return logRepository.saveAll(logs).toArray(new Log[0]);
-        } catch (Exception e) {
-            LOG.warning(e.getLocalizedMessage());
-            // TODO: fix error handling
-            return new Log[0];
-        }
+        List<Log> logs = Arrays.stream(logDTOs).map(dto -> new Log(dto)).collect(Collectors.toList());
+        return logRepository.saveAll(logs).toArray(new Log[0]);
     }
 
 }
