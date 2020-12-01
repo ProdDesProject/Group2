@@ -17,7 +17,7 @@ public class LogDTO {
     @Min(0)
     @NotNull
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private long epochDate;
+    private Long epochDate;
 
     /**
      * The heartRate per minute for this specific time.
@@ -25,7 +25,7 @@ public class LogDTO {
     @Min(0)
     @NotNull
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private int heartRate;
+    private Integer heartRate;
 
     /**
      * The user this log belongs to.
@@ -33,7 +33,7 @@ public class LogDTO {
     @Min(0)
     @NotNull
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private long userId;
+    private Long userId;
 
     /**
      * The night this log belongs to. Every sleepsession represents one night.
@@ -41,12 +41,12 @@ public class LogDTO {
     @Min(0)
     @NotNull
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private long sleepSession;
+    private Long sleepSession;
 
     public LogDTO() {
     }
 
-    public LogDTO(long epochDate, int heartRate, long userId, long sleepSession) {
+    public LogDTO(Long epochDate, Integer heartRate, Long userId, Long sleepSession) {
         this.epochDate = epochDate;
         this.heartRate = heartRate;
         this.userId = userId;

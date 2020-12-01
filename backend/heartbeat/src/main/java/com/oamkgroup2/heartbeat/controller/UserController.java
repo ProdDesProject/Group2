@@ -1,7 +1,10 @@
 package com.oamkgroup2.heartbeat.controller;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
+import com.oamkgroup2.heartbeat.exception.EntityNotFoundException;
 import com.oamkgroup2.heartbeat.model.User;
 import com.oamkgroup2.heartbeat.service.UserService;
 
@@ -31,9 +34,10 @@ public class UserController {
      * 
      * @param id the user to get.
      * @return JSON representation of the user object.
+     * @throws EntityNotFoundException
      */
     @GetMapping("/get")
-    public ResponseEntity<User> getUserById(@RequestBody long id) {
+    public ResponseEntity<User> getUserById(@RequestBody long id) throws EntityNotFoundException {
         return new ResponseEntity<>(this.userService.getUserById(id), HttpStatus.OK);
     }
 
@@ -46,6 +50,11 @@ public class UserController {
     @PostMapping("/new")
     public ResponseEntity<User> createNewUser(@Valid @RequestBody User user) {
         return new ResponseEntity<>(this.userService.newUser(user), HttpStatus.OK);
+    }
+
+    @GetMapping("/getall")
+    public ResponseEntity<List<User>> getAllUsers() {
+        return new ResponseEntity<>(this.userService.getAll(), HttpStatus.OK);
     }
 
 }

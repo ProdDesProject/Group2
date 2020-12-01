@@ -1,6 +1,7 @@
 package com.oamkgroup2.heartbeat.service;
 
-import com.google.gson.Gson;
+import com.oamkgroup2.heartbeat.exception.EntityNotFoundException;
+
 import com.oamkgroup2.heartbeat.model.User;
 import com.oamkgroup2.heartbeat.repository.UserRepository;
 
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -20,10 +22,6 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    /**
-     * Tool for converting to and from JSON and POJO objects.
-     */
-    private final Gson GSON = new Gson();
     private static final Logger LOG = Logger.getLogger(UserService.class.getName());
 
     /**
@@ -34,14 +32,7 @@ public class UserService {
      * @return the created user.
      */
     public User newUser(@Valid User user) {
-        // TODO: ensure no duplicate users can be created
-        try {
-            return userRepository.save(user);
-        } catch (Exception e) {
-            LOG.warning(e.getLocalizedMessage());
-            // TODO: fix error handling
-            return null;
-        }
+        return userRepository.save(user);
     }
 
     /**
@@ -49,18 +40,18 @@ public class UserService {
      * 
      * @param the id to find.
      * @return the user object.
+     * @throws EntityNotFoundException
      */
-    public User getUserById(long id) {
-        try {
-            Optional<User> user = userRepository.findById(id);
-            if (user.isPresent()) {
-                return user.get();
-            }
-            return null; // TODO: fix error handling
-        } catch (Exception e) {
-            LOG.warning(e.getLocalizedMessage());
-            return null; // TODO: fix error handling
+    public User getUserById(long id) throws EntityNotFoundException {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            return user.get();
         }
+        throw new EntityNotFoundException("user with id: " + id);
+    }
+
+    public List<User> getAll() {
+        return userRepository.findAll();
     }
 
 }

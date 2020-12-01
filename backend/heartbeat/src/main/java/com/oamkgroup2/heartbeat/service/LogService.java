@@ -3,10 +3,11 @@ package com.oamkgroup2.heartbeat.service;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.gson.Gson;
+import com.oamkgroup2.heartbeat.exception.EntityNotFoundException;
 import com.oamkgroup2.heartbeat.model.Log;
 import com.oamkgroup2.heartbeat.model.LogDTO;
 import com.oamkgroup2.heartbeat.repository.LogRepository;
+import com.oamkgroup2.heartbeat.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,10 +28,9 @@ public class LogService {
     @Autowired
     private LogRepository logRepository;
 
-    /**
-     * Tool for converting to and from JSON and POJO objects.
-     */
-    private final Gson GSON = new Gson();
+    @Autowired
+    private UserRepository userRepository;
+
     private static final Logger LOG = Logger.getLogger(LogService.class.getName());
 
     /**
@@ -58,14 +58,20 @@ public class LogService {
      * @param stringLog JSON representation of an array of logs.
      */
     public Log[] newBatch(@Valid LogDTO[] logDTOs) {
-        try {
-            List<Log> logs = Arrays.stream(logDTOs).map(dto -> new Log(dto)).collect(Collectors.toList());
-            return logRepository.saveAll(logs).toArray(new Log[0]);
-        } catch (Exception e) {
-            LOG.warning(e.getLocalizedMessage());
-            // TODO: fix error handling
-            return new Log[0];
+        List<Log> logs = Arrays.stream(logDTOs).map(dto -> new Log(dto)).collect(Collectors.toList());
+        return logRepository.saveAll(logs).toArray(new Log[0]);
+    }
+
+    public long getLatestSleepSession(Long userId) throws EntityNotFoundException {
+        if (userRepository.existsById(userId)) {
+            long[] sleepSessions = logRepository.findTopSleepSessionsForUser(userId);
+            LOG.info("sleepsession length: " + sleepSessions.length);
+            if (sleepSessions.length > 0) {
+                return sleepSessions[0] + 1;
+            }
+            return 0;
         }
+        throw new EntityNotFoundException("user with id: " + userId);
     }
 
 }

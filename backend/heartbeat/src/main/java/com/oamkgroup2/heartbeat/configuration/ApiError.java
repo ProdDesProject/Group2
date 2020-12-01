@@ -1,7 +1,6 @@
 package com.oamkgroup2.heartbeat.configuration;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 

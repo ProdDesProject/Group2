@@ -2,7 +2,7 @@ package com.oamkgroup2.heartbeat.exception;
 
 public class DuplicateEntityException extends Exception {
 
-    DuplicateEntityException(String message) {
+    public DuplicateEntityException(String message) {
         super(message);
     }
 
