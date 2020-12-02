@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final static String TAG = MainActivity.class.getSimpleName();
     PolarBleApi api;
-    String DEVICE_ID = "50924E2C";  //Note: SET OWN DEVICE ID OR USE SCAN FUNCTIONALITY
+    String DEVICE_ID = "50926E22";  //Note: SET OWN DEVICE ID OR USE SCAN FUNCTIONALITY
     int heartRate = 0;
 
     boolean isConnected;

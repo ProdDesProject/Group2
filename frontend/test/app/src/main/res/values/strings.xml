@@ -11,4 +11,11 @@
     <string name="menu_profile">Profile</string>
     <string name="menu_test">Test</string>
     <string name="menu_test2">Test2</string>
+
+    <string name="user_Name">David</string>
+    <string name="user_Email">david@gmail.com</string>
+    <string name="user_Age">19</string>
+    <string name="ProfileNameLabel">Name:</string>
+    <string name="ProfileEmailLabel">Email:</string>
+    <string name="ProfileAgeLabel">Age:</string>
 </resources>
