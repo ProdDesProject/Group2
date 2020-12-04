@@ -1,8 +1,11 @@
 package com.project.test;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -49,6 +52,12 @@ public class MainActivity extends AppCompatActivity {
     boolean isConnected;
     boolean isConnecting;
 
+    String username;
+    String useremail;
+    public static final String SHARED_PREFS = "sharedPrefs";
+    public static final String NAME = "name";
+    public static final String EMAIL = "email";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,8 +73,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        loadData();
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
+        View headerView = navigationView.getHeaderView(0);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
@@ -75,8 +86,12 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
-    }
 
+        TextView nav_header_title = headerView.findViewById(R.id.nav_header_title);
+        nav_header_title.setText(username);
+        TextView nav_header_subtitle = headerView.findViewById(R.id.textView);
+        nav_header_subtitle.setText(useremail);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -90,5 +105,11 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    public void loadData() {
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        username = sharedPreferences.getString(NAME, "");
+        useremail = sharedPreferences.getString(EMAIL, "");
     }
 }

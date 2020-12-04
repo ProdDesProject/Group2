@@ -1,9 +1,7 @@
 package com.project.test.ui.profile;
 
-import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +16,9 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.project.test.R;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class ProfileFragment extends Fragment {
 
@@ -31,7 +30,13 @@ public class ProfileFragment extends Fragment {
     EditText user_email;
     EditText user_age;
 
-    Button EditProfile;
+    Button SubmitProfile;
+
+    public static final String SHARED_PREFS = "sharedPrefs";
+    public static final String NAME = "name";
+    public static final String EMAIL = "email";
+    public static final String AGE = "age";
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -46,12 +51,12 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        user_name = (EditText) root.findViewById(R.id.user_Name);
-        user_email = (EditText) root.findViewById(R.id.user_Email);
-        user_age = (EditText) root.findViewById(R.id.user_age);
-        EditProfile = (Button) root.findViewById(R.id.EditProfile);
+        user_name = root.findViewById(R.id.user_Name);
+        user_email = root.findViewById(R.id.user_Email);
+        user_age = root.findViewById(R.id.user_age);
+        SubmitProfile = root.findViewById(R.id.SubmitProfile);
 
-        EditProfile.setOnClickListener(new View.OnClickListener() {
+        SubmitProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 username = user_name.getText().toString();
@@ -59,21 +64,36 @@ public class ProfileFragment extends Fragment {
                 if(!user_age.getText().toString().equals("")) {
                     userage = Integer.parseInt(user_age.getText().toString());
                 }
-
-                //ToastforTest(username);
-                ToastforTest(useremail);
-                //ToastforTest(String.valueOf(userage));
+                saveData();
             }
         });
+        loadData();
+        updateView();
         return root;
     }
 
-    private void ToastforTest(String test) {
-        Toast.makeText(getActivity(), test, Toast.LENGTH_SHORT).show();
-        /*
-        Toast.makeText(getActivity(), username, Toast.LENGTH_SHORT).show();
-        Toast.makeText(getActivity(), useremail, Toast.LENGTH_SHORT).show();
-        Toast.makeText(getActivity(), String.valueOf(userage), Toast.LENGTH_SHORT).show();
-        */
+    public void saveData() {
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putString(NAME, username);
+        editor.putString(EMAIL, useremail);
+        editor.putString(AGE, Integer.toString(userage));
+
+        editor.apply();
+        Toast.makeText(getActivity(), "Data has been saved", Toast.LENGTH_SHORT).show();
+    }
+
+    public void loadData() {
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        username = sharedPreferences.getString(NAME, "");
+        useremail = sharedPreferences.getString(EMAIL, "");
+        userage = Integer.parseInt(sharedPreferences.getString(AGE,"0"));
+    }
+
+    public void updateView() {
+        user_name.setText(username);
+        user_email.setText(useremail);
+        user_age.setText(Integer.toString(userage));
     }
 }
