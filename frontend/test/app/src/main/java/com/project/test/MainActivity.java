@@ -3,6 +3,12 @@ package com.project.test;
 import android.os.Bundle;
 import android.view.Menu;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.navigation.NavController;
@@ -17,6 +23,7 @@ import androidx.appcompat.widget.Toolbar;
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
+    private static String restMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +51,27 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
+        String url = "https://httpbin.org/get";
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Display the first 500 characters of the response string.
+                        setRestMessage("Response is: "+ response.substring(0,330));
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                setRestMessage("That didn't work!");
+            }
+        });
+
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest);
     }
 
     @Override
@@ -58,5 +86,13 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    public static String getRestMessage() {
+        return restMessage;
+    }
+
+    public static void setRestMessage(String newRestMessage) {
+        restMessage = newRestMessage;
     }
 }
