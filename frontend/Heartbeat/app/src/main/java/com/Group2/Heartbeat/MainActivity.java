@@ -1,7 +1,10 @@
 package com.Group2.Heartbeat;
 
+import android.Manifest;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
@@ -18,7 +21,25 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import io.reactivex.CompletableObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import polar.com.sdk.api.PolarBleApi;
+import polar.com.sdk.api.PolarBleApiCallback;
+import polar.com.sdk.api.PolarBleApiDefaultImpl;
+import polar.com.sdk.api.model.PolarAccelerometerData;
+import polar.com.sdk.api.model.PolarDeviceInfo;
+import polar.com.sdk.api.model.PolarEcgData;
+import polar.com.sdk.api.model.PolarExerciseData;
+import polar.com.sdk.api.model.PolarExerciseEntry;
+import polar.com.sdk.api.model.PolarHrBroadcastData;
+import polar.com.sdk.api.model.PolarHrData;
+import polar.com.sdk.api.model.PolarOhrPPGData;
+import polar.com.sdk.api.model.PolarOhrPPIData;
+import polar.com.sdk.api.model.PolarSensorSetting;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final static String TAG = MainActivity.class.getSimpleName();
     PolarBleApi api;
-    String DEVICE_ID = "50926E22";  //Note: SET OWN DEVICE ID OR USE SCAN FUNCTIONALITY
+    String DEVICE_ID = "50924E2C";  //Note: SET OWN DEVICE ID OR USE SCAN FUNCTIONALITY
     int heartRate = 0;
 
     boolean isConnected;
@@ -44,14 +65,90 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        api = PolarBleApiDefaultImpl.defaultImplementation(this, PolarBleApi.FEATURE_HR);
+
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Connecting...", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Snackbar.make(view, "Connecting...", Snackbar.LENGTH_LONG).show();
+                connect();
             }
         });
+
+        api.setApiCallback(new PolarBleApiCallback() {
+            @Override
+            public void blePowerStateChanged(boolean powered) {
+                Log.d("MyApp", "BLE power: " + powered);
+            }
+
+            @Override
+            public void deviceConnected(PolarDeviceInfo polarDeviceInfo) {
+                Log.d("MyApp", "CONNECTED: " + polarDeviceInfo.deviceId);
+                isConnected = true;
+                isConnecting = false;
+            }
+
+            @Override
+            public void deviceConnecting(PolarDeviceInfo polarDeviceInfo) {
+                Log.d("MyApp", "CONNECTING: " + polarDeviceInfo.deviceId);
+                isConnected = false;
+                isConnecting = true;
+            }
+
+            @Override
+            public void deviceDisconnected(PolarDeviceInfo polarDeviceInfo) {
+                Log.d("MyApp", "DISCONNECTED: " + polarDeviceInfo.deviceId);
+                isConnected = false;
+                isConnecting = false;
+            }
+
+            @Override
+            public void ecgFeatureReady(String identifier) {
+            }
+
+            @Override
+            public void accelerometerFeatureReady(String identifier) {
+            }
+
+            @Override
+            public void ppgFeatureReady(String identifier) {
+            }
+
+            @Override
+            public void ppiFeatureReady(String identifier) {
+            }
+
+            @Override
+            public void biozFeatureReady(String identifier) {
+            }
+
+            @Override
+            public void hrFeatureReady(String identifier) {
+                Log.d("MyApp", "HR READY: " + identifier);
+            }
+
+            @Override
+            public void batteryLevelReceived(String identifier, int level) {
+            }
+
+            @Override
+            public void hrNotificationReceived(String identifier, PolarHrData data) {
+                Log.d("MyApp", "HR: " + data.hr);
+                heartRate = data.hr;
+
+            }
+
+            @Override
+            public void polarFtpFeatureReady(String s) {
+            }
+
+        });
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            this.requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
 
         loadData();
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -91,5 +188,13 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         username = sharedPreferences.getString(NAME, "");
         useremail = sharedPreferences.getString(EMAIL, "");
+    }
+
+    public void connect() {
+        try{
+            api.connectToDevice(this.DEVICE_ID);
+        } catch(Exception e) {
+            Log.d("MyApp", "Exception caught: " + e );
+        }
     }
 }
