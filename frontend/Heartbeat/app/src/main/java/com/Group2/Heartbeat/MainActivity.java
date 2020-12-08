@@ -21,25 +21,13 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import io.reactivex.CompletableObserver;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
+import androidx.appcompat.app.AppCompatActivity;
+
 import polar.com.sdk.api.PolarBleApi;
 import polar.com.sdk.api.PolarBleApiCallback;
 import polar.com.sdk.api.PolarBleApiDefaultImpl;
-import polar.com.sdk.api.model.PolarAccelerometerData;
 import polar.com.sdk.api.model.PolarDeviceInfo;
-import polar.com.sdk.api.model.PolarEcgData;
-import polar.com.sdk.api.model.PolarExerciseData;
-import polar.com.sdk.api.model.PolarExerciseEntry;
-import polar.com.sdk.api.model.PolarHrBroadcastData;
 import polar.com.sdk.api.model.PolarHrData;
-import polar.com.sdk.api.model.PolarOhrPPGData;
-import polar.com.sdk.api.model.PolarOhrPPIData;
-import polar.com.sdk.api.model.PolarSensorSetting;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -197,4 +185,41 @@ public class MainActivity extends AppCompatActivity {
             Log.d("MyApp", "Exception caught: " + e );
         }
     }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        if(requestCode == 1) {
+            Log.d(TAG,"bt ready");
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        try {
+            api.backgroundEntered();
+        } catch (Exception e) {
+            Log.d("MyApp", "Error: " + e);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("MyApp", "Back to foreground!");
+        try {
+            api.foregroundEntered();
+        } catch (Exception e) {
+            Log.d("MyApp", "Error: " + e);
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        api.shutDown();
+    }
+
 }
+
