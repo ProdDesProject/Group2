@@ -29,16 +29,19 @@ public class ResultService {
      * @throws EntityNotFoundException
      */
     public NightResult getLatestResult(long userId) throws EntityNotFoundException {
-        NightResult result = new NightResult();
-        result.setUserId(userId);
-        result.setShape(ShapeResult.UNDEFINED);
-        Log[] lastNight = this.logRepository.findLastNightLogsForUser(userId);
-        result.setLogs(lastNight);
-        // TODO: analyze ShapeResult
-        if (lastNight.length > 0) {
-            return result;
+        if (userId >= 0) {
+            NightResult result = new NightResult();
+            result.setUserId(userId);
+            result.setShape(ShapeResult.UNDEFINED);
+            Log[] lastNight = this.logRepository.findLastNightLogsForUser(userId);
+            result.setLogs(lastNight);
+            // TODO: analyze ShapeResult
+            if (lastNight.length > 0) {
+                return result;
+            }
+            throw new EntityNotFoundException("logs for user with id: " + userId);
         }
-        throw new EntityNotFoundException("user with id: " + userId);
+        throw new EntityNotFoundException(" user with id: " + userId);
     }
 
     /**
@@ -48,6 +51,28 @@ public class ResultService {
      */
     public NightResult getTestResult() throws EntityNotFoundException {
         return this.getLatestResult(0);
+    }
+
+    /**
+     * Return the NightResult for a specific user on a specific night.
+     * 
+     * @throws EntityNotFoundException
+     */
+    public NightResult getSpecificResult(long userId, long sleepSession) throws EntityNotFoundException {
+        if (sleepSession >= 0 && userId >= 0) {
+            NightResult result = new NightResult();
+            result.setUserId(userId);
+            result.setShape(ShapeResult.UNDEFINED);
+            Log[] lastNight = this.logRepository.findNightsByUserAndSleepSession(userId, sleepSession);
+            result.setLogs(lastNight);
+            // TODO: analyze ShapeResult
+            if (lastNight.length > 0) {
+                return result;
+            }
+            throw new EntityNotFoundException(
+                    "logs for user with id: " + userId + " and sleepsession with id: " + sleepSession);
+        }
+        throw new EntityNotFoundException(" user with id: " + userId + " and sleepsession with id: " + sleepSession);
     }
 
 }
