@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Heartbeat</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Sean</string>
+    <string name="nav_header_subtitle">email@students.oamk.fi</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_profile">Profile</string>
+    <string name="menu_sleephist">Sleep History</string>
+
+    <string name="user_Name">David</string>
+    <string name="user_Email">david@gmail.com</string>
+    <string name="user_Age">19</string>
+    <string name="ProfileNameLabel">Name:</string>
+    <string name="ProfileEmailLabel">Email:</string>
+    <string name="ProfileAgeLabel">Age:</string>
+    <string name="profile_submit">Submit</string>
+</resources>
