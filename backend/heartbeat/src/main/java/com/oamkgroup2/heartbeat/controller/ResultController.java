@@ -28,8 +28,15 @@ public class ResultController {
      * @throws EntityNotFoundException
      */
     @GetMapping("/get/latest")
-    public ResponseEntity<NightResult> getUserById(@RequestBody long userId) throws EntityNotFoundException {
+    public ResponseEntity<NightResult> getLatestResultByUserId(@RequestBody long userId)
+            throws EntityNotFoundException {
         return new ResponseEntity<>(this.resultService.getLatestResult(userId), HttpStatus.OK);
+    }
+
+    @GetMapping("/get/specific")
+    public ResponseEntity<NightResult> getSpecificNightResult(@RequestBody long userId, long sleepsession)
+            throws EntityNotFoundException {
+        return new ResponseEntity<>(this.resultService.getSpecificResult(userId, sleepsession), HttpStatus.OK);
     }
 
     /**
