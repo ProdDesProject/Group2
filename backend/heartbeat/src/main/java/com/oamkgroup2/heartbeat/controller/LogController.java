@@ -39,12 +39,13 @@ public class LogController {
     }
 
     /**
-     * Get the latest +1 sleepsession. Represents one night's sleep, and is used to
-     * find all logs for one night.
+     * Get the latest +1 sleepsession. Usually called when a new 'sleep session' (or
+     * night), is started, so the correct sleepsession can be set. Represents one
+     * night's sleep, and is used to find all logs for one night.
      * 
      * @throws EntityNotFoundException
      */
-    @GetMapping("/sleepsession")
+    @GetMapping("/sleepsession/latest")
     public ResponseEntity<Long> getLatestSleepSession(@RequestBody Long userId) throws EntityNotFoundException {
         return new ResponseEntity<>(logService.getLatestSleepSession(userId), HttpStatus.OK);
     }
