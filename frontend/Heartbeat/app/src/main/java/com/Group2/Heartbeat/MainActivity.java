@@ -30,6 +30,7 @@ import androidx.appcompat.widget.Toolbar;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import com.google.gson.*;
 
 import polar.com.sdk.api.PolarBleApi;
 
@@ -42,8 +43,7 @@ public class MainActivity extends AppCompatActivity {
     String DEVICE_ID = "50926E22";  //Note: SET OWN DEVICE ID OR USE SCAN FUNCTIONALITY
     int heartRate = 0;
 
-    boolean isConnected;
-    boolean isConnecting;
+    private Gson gson;
 
     String username;
     String useremail;
@@ -88,21 +88,32 @@ public class MainActivity extends AppCompatActivity {
         TextView nav_header_subtitle = headerView.findViewById(R.id.textView);
         nav_header_subtitle.setText(useremail);
 
+        //creation of gson objects for parsing rest response
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gson = gsonBuilder.create();
+
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
-        String url = "http://192.168.42.218:8080/user/getall";
-//        String url = "https://httpbin.org/get";
+        String url = "http://192.168.56.1:8080/results/get/test";
 
         // Request a string response from the provided URL.
-        JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
 
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
                 try {
                     // Display the first 500 characters of the response string.
-                    setRestMessage("Response is: " +response.getJSONObject(0).optString("name"));
+                    setRestMessage("Response is: " +response);
                     System.out.println(response);
+
+                    NightResult nightResults = gson.fromJson(response.toString(), NightResult.class);
+
+                    for (Log log: nightResults.getLogs()) {
+
+                        System.out.println(log.getHeartRate());
+                    };
+
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
