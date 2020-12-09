@@ -1,5 +1,6 @@
 package com.oamkgroup2.heartbeat.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -20,14 +21,16 @@ public class User {
      * The userId.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     @NotBlank
+    @Column(name = "name")
     String name;
 
     @NotNull
     @Min(0)
+    @Column(name = "age")
     int age;
 
     // TODO: add profile pic

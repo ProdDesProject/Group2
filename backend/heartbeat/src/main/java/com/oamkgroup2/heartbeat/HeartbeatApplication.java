@@ -37,6 +37,7 @@ public class HeartbeatApplication {
 		return args -> {
 			for (int i = 0; i < 60; i++) {
 				Log log = new Log();
+				// log.setId((long) i);
 				log.setUserId(1L);
 				LocalDateTime time = LocalDateTime.of(2020, Month.NOVEMBER, 25, 2, 0, 0);
 				time = time.plusMinutes((long) i);

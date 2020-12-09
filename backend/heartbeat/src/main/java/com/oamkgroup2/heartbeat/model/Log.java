@@ -20,14 +20,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * user.
  */
 @Entity
-@Table(name = "Heartbeat_logs")
+@Table(name = "heartbeatlogs")
 public class Log {
 
     /**
      * The log id.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     /**
@@ -35,6 +35,7 @@ public class Log {
      */
     @NotNull
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Column(name = "logdate")
     LocalDateTime date;
 
     /**
@@ -43,7 +44,7 @@ public class Log {
     @Min(0)
     @NotNull
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @Column(name = "heart_rate")
+    @Column(name = "heartrate")
     int heartRate;
 
     /**
@@ -52,7 +53,7 @@ public class Log {
     @Min(0)
     @NotNull
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @Column(name = "user_id")
+    @Column(name = "userid")
     long userId;
 
     /**
@@ -61,7 +62,7 @@ public class Log {
     @Min(0)
     @NotNull
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @Column(name = "sleep_session")
+    @Column(name = "sleepsession")
     long sleepSession;
 
     public Log() {
