@@ -29,6 +29,21 @@ import polar.com.sdk.api.PolarBleApiDefaultImpl;
 import polar.com.sdk.api.model.PolarDeviceInfo;
 import polar.com.sdk.api.model.PolarHrData;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import com.google.gson.*;
+
+
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
@@ -46,6 +61,10 @@ public class MainActivity extends AppCompatActivity {
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String NAME = "name";
     public static final String EMAIL = "email";
+
+    private Gson gson;
+
+    private static String restMessage = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,6 +165,47 @@ public class MainActivity extends AppCompatActivity {
         nav_header_title.setText(username);
         TextView nav_header_subtitle = headerView.findViewById(R.id.textView);
         nav_header_subtitle.setText(useremail);
+
+        //creation of gson objects for parsing rest response
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gson = gsonBuilder.create();
+
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
+        String url = "http://192.168.56.1:8080/results/get/test";
+
+        // Request a string response from the provided URL.
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    // Display the first 500 characters of the response string.
+                    setRestMessage("Response is: " +response);
+                    System.out.println(response);
+
+                    NightResult nightResults = gson.fromJson(response.toString(), NightResult.class);
+
+                    for (com.Group2.Heartbeat.Log log: nightResults.getLogs()) {
+
+                        System.out.println(log.getHeartRate());
+                    };
+
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                setRestMessage("That didn't work!");
+                System.out.println(error.getMessage());
+            }
+        });
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonRequest);
     }
 
     @Override
@@ -216,6 +276,16 @@ public class MainActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
         api.shutDown();
+    }
+
+    //gets static restMessage value
+    public static String getRestMessage() {
+        return restMessage;
+    }
+
+    //sets the static restMessage value
+    public static void setRestMessage(String restMessage) {
+        MainActivity.restMessage = restMessage;
     }
 
 }

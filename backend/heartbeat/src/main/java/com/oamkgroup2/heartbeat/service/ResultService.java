@@ -33,7 +33,7 @@ public class ResultService {
             NightResult result = new NightResult();
             result.setUserId(userId);
             result.setShape(ShapeResult.UNDEFINED);
-            Log[] lastNight = this.logRepository.findLastNightLogsForUser(userId);
+            Log[] lastNight = this.logRepository.findAll().toArray(new Log[0]);
             result.setLogs(lastNight);
             // TODO: analyze ShapeResult
             if (lastNight.length > 0) {
@@ -50,7 +50,7 @@ public class ResultService {
      * @throws EntityNotFoundException
      */
     public NightResult getTestResult() throws EntityNotFoundException {
-        return this.getLatestResult(0);
+        return this.getLatestResult(1);
     }
 
     /**

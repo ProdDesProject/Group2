@@ -3,6 +3,7 @@ package com.Group2.Heartbeat.ui.home;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import com.Group2.Heartbeat.MainActivity;
 
 public class HomeViewModel extends ViewModel {
 
@@ -11,9 +12,9 @@ public class HomeViewModel extends ViewModel {
 
     public HomeViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("this is a Home page");
         mainText = new MutableLiveData<>();
-        mainText.setValue("testingiingngngng");
+        mText.setValue(MainActivity.getRestMessage());
+        mainText.setValue("Message");
     }
 
     public LiveData<String> getText() {
