@@ -43,6 +43,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import com.google.gson.*;
 
+import java.time.LocalDateTime;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -103,6 +105,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Create the necessary variables for posting
+        String PostUrl = "https://reqbin.com/echo/post/json";
+        RequestQueue queue2 = Volley.newRequestQueue(MainActivity.this);
+
+
         api.setApiCallback(new PolarBleApiCallback() {
             @Override
             public void blePowerStateChanged(boolean powered) {
@@ -140,6 +147,33 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("MyApp", "HR: " + data.hr);
                 heartRate = data.hr;
 
+                // Initialise the log to be sent
+                //com.Group2.Heartbeat.Log log = new com.Group2.Heartbeat.Log(LocalDateTime.now().toString(), heartRate, 0, 0);
+                //String json = gson.toJson(log);
+                JSONObject json = new JSONObject();
+                try {
+                    json.put("date", LocalDateTime.now().toString());
+                    json.put("hearRate", heartRate);
+                    json.put("userID", 0);
+                    json.put("sleepSession", 0);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                JsonObjectRequest  jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, PostUrl, json, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        System.out.println(response);
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                });
+
+                queue2.add(jsonObjectRequest);
             }
         });
 
@@ -206,6 +240,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Add the request to the RequestQueue.
         queue.add(jsonRequest);
+
+
     }
 
     @Override
