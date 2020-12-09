@@ -6,6 +6,13 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
@@ -34,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
 
     String username;
     String useremail;
+
+    private static String restMessage = "";
+
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String NAME = "name";
     public static final String EMAIL = "email";
@@ -71,6 +81,28 @@ public class MainActivity extends AppCompatActivity {
         nav_header_title.setText(username);
         TextView nav_header_subtitle = headerView.findViewById(R.id.textView);
         nav_header_subtitle.setText(useremail);
+
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
+        String url = "https://httpbin.org/get";
+
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String response) {
+                // Display the first 500 characters of the response string.
+                setRestMessage("Response is: "+ response.substring(0,330));
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                setRestMessage("That didn't work!");
+            }
+        });
+
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest);
     }
 
     @Override
@@ -91,5 +123,15 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         username = sharedPreferences.getString(NAME, "");
         useremail = sharedPreferences.getString(EMAIL, "");
+    }
+
+    //Returns the restMessage value
+    public static String getRestMessage() {
+        return restMessage;
+    }
+
+    //Sets the static restMessage value
+    public static void setRestMessage(String newRestMessage) {
+        restMessage = newRestMessage;
     }
 }
