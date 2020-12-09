@@ -10,6 +10,8 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -24,6 +26,10 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import polar.com.sdk.api.PolarBleApi;
 
@@ -84,25 +90,33 @@ public class MainActivity extends AppCompatActivity {
 
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
-        String url = "https://httpbin.org/get";
+        String url = "http://192.168.42.218:8080/user/getall";
+//        String url = "https://httpbin.org/get";
 
         // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+        JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+
 
             @Override
-            public void onResponse(String response) {
-                // Display the first 500 characters of the response string.
-                setRestMessage("Response is: "+ response.substring(0,330));
+            public void onResponse(JSONArray response) {
+                try {
+                    // Display the first 500 characters of the response string.
+                    setRestMessage("Response is: " +response.getJSONObject(0).optString("name"));
+                    System.out.println(response);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 setRestMessage("That didn't work!");
+                System.out.println(error.getMessage());
             }
         });
 
         // Add the request to the RequestQueue.
-        queue.add(stringRequest);
+        queue.add(jsonRequest);
     }
 
     @Override
