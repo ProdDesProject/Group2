@@ -48,7 +48,7 @@ public class HomeFragment extends Fragment {
         loadData();
 
         TextView welcomeText = root.findViewById(R.id.welcomeText);
-        welcomemessage = "Hi, " + username;
+        welcomemessage = "Hi, " + username.toString();
         welcomeText.setText(welcomemessage);
 
         return root;
