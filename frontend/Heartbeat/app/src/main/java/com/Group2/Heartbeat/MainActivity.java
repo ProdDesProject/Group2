@@ -42,6 +42,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.google.gson.*;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.time.LocalDateTime;
 
@@ -70,6 +73,24 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        /*
+        GraphView graph = (GraphView) findViewById(R.id.graph);
+        int graphMaxY = 10;
+        int graphMaxX = 10;
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[] {
+                new DataPoint(0, 1),
+                new DataPoint(1, 5),
+                new DataPoint(2, 3),
+                new DataPoint(3, 2),
+                new DataPoint(4, 6)
+        });
+        graph.addSeries(series);
+        graph.getViewport().setMaxX(graphMaxX);
+        graph.getViewport().setMaxY(graphMaxY);
+        graph.setVisibility(View.VISIBLE);
+        */
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
