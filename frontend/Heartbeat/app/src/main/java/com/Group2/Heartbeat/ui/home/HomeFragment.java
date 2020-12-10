@@ -17,6 +17,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 import com.Group2.Heartbeat.R;
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.GridLabelRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
@@ -51,6 +52,15 @@ public class HomeFragment extends Fragment {
         graph.addSeries(series);
         graph.getViewport().setMaxX(graphMaxX);
         graph.getViewport().setMaxY(graphMaxY);
+        GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
+        gridLabel.setHorizontalAxisTitle("Time");
+        graph.getGridLabelRenderer().setHorizontalAxisTitle("Time");
+        gridLabel.setVerticalAxisTitle("HeartRate");
+        graph.getGridLabelRenderer().setVerticalAxisTitle("HeartRate");
+        gridLabel.setHorizontalLabelsVisible(true);
+        gridLabel.setVerticalLabelsVisible(true);
+        graph.getGridLabelRenderer().setGridStyle(GridLabelRenderer.GridStyle.BOTH);
+        gridLabel.setHumanRounding(true);
         graph.setVisibility(View.VISIBLE);
 
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
