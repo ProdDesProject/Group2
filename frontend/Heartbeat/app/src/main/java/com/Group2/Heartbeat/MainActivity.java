@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject json = new JSONObject();
                     LocalDateTime time = LocalDateTime.now();
                     ZoneId zoneId = ZoneId.systemDefault(); // or: ZoneId.of("Europe/Oslo");
-                    long epoch = time.atZone(zoneId).toEpochSecond();
+                    long epoch = time.atZone(zoneId).toEpochSecond() * 1000;
                     try {
                         json.put("epochDate", epoch);
                         json.put("heartRate", heartRate);
