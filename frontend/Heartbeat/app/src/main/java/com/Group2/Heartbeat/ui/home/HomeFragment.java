@@ -63,6 +63,7 @@ public class HomeFragment extends Fragment {
         homeViewModel.nightResult.observe(getViewLifecycleOwner(), new Observer<NightResult>() {
             @Override
             public void onChanged(@Nullable NightResult result) {
+                System.out.println("onchange!!!!!!!!!!!!!!!!");
                 nightResult = result;
                 if (nightResult.getUserId() >= 0) {
                     final int[] graphMaxY = {0};
@@ -74,9 +75,10 @@ public class HomeFragment extends Fragment {
 
                     LineGraphSeries<DataPoint> series = new LineGraphSeries<>(dataPoints);
                     int graphMaxX = dataPoints.length;
-                    //graph.getViewport().setMaxX(graphMaxX);
-                    //graph.getViewport().setMaxY(graphMaxY[0]);
-                    //graph.getViewport().setMinY(0);
+                    System.out.println("datapoints: " + dataPoints.length);
+                    graph.getViewport().setMaxX(graphMaxX);
+                    graph.getViewport().setMaxY(graphMaxY[0]);
+                    graph.getViewport().setMinY(0);
                     graph.getGridLabelRenderer().setPadding(60);
                     GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
                     gridLabel.setHorizontalAxisTitle("Time");
@@ -107,10 +109,10 @@ public class HomeFragment extends Fragment {
         graph.addSeries(series);
         graph.addSeries(hammock);
         this.getNightResultFromServer();
-        graph = root.findViewById(R.id.graph);
 
          */
 
+        graph = root.findViewById(R.id.graph);
 
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
@@ -125,6 +127,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        getNightResultFromServer();
         loadData();
 
         TextView welcomeText = root.findViewById(R.id.welcomeText);

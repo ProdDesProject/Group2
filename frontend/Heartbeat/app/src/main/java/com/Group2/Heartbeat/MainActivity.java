@@ -41,6 +41,7 @@ import org.json.JSONObject;
 import com.google.gson.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     PolarBleApi api;
     String DEVICE_ID = "50924E2C";  //Note: SET OWN DEVICE ID OR USE SCAN FUNCTIONALITY
     int heartRate = 0;
+    int timer;
 
     boolean isConnected;
     boolean isConnecting;
@@ -104,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Create the necessary variables for posting
-        String PostUrl = "https://reqbin.com/echo/post/json";
+        String PostUrl = "http://192.168.42.21:8080/logs/new/log";
         RequestQueue queue2 = Volley.newRequestQueue(MainActivity.this);
 
 
@@ -145,33 +147,40 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("MyApp", "HR: " + data.hr);
                 heartRate = data.hr;
 
-                // Initialise the log to be sent
-                //com.Group2.Heartbeat.Log log = new com.Group2.Heartbeat.Log(LocalDateTime.now().toString(), heartRate, 0, 0);
-                //String json = gson.toJson(log);
-                JSONObject json = new JSONObject();
-                try {
-                    json.put("date", LocalDateTime.now().toString());
-                    json.put("hearRate", heartRate);
-                    json.put("userID", 0);
-                    json.put("sleepSession", 0);
+                timer = timer + 1;
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                if (timer >= 30) {
+                    // Initialise the log to be sent
+                    JSONObject json = new JSONObject();
+                    LocalDateTime time = LocalDateTime.now();
+                    ZoneId zoneId = ZoneId.systemDefault(); // or: ZoneId.of("Europe/Oslo");
+                    long epoch = time.atZone(zoneId).toEpochSecond() * 1000;
+                    try {
+                        json.put("epochDate", epoch);
+                        json.put("heartRate", heartRate);
+                        json.put("userId", 0);
+                        json.put("sleepSession", 0);
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, PostUrl, json, new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            System.out.println(response);
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            error.printStackTrace();
+                        }
+                    });
+
+                    queue2.add(jsonObjectRequest);
+                    timer = 0;
                 }
-
-                JsonObjectRequest  jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, PostUrl, json, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        System.out.println(response);
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        error.printStackTrace();
-                    }
-                });
-
-                queue2.add(jsonObjectRequest);
             }
         });
 
