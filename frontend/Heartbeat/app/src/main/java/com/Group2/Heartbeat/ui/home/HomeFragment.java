@@ -74,17 +74,15 @@ public class HomeFragment extends Fragment {
 
                     LineGraphSeries<DataPoint> series = new LineGraphSeries<>(dataPoints);
                     int graphMaxX = dataPoints.length;
-                    System.out.println("graphX" + graphMaxX);
-                    System.out.println("graphY" + graphMaxY[0]);
-                    graph.getViewport().setMaxX(graphMaxX);
-                    graph.getViewport().setMaxY(graphMaxY[0]);
-                    graph.getViewport().setMinY(0);
+                    //graph.getViewport().setMaxX(graphMaxX);
+                    //graph.getViewport().setMaxY(graphMaxY[0]);
+                    //graph.getViewport().setMinY(0);
                     graph.getGridLabelRenderer().setPadding(60);
                     GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
                     gridLabel.setHorizontalAxisTitle("Time");
                     gridLabel.setVerticalAxisTitle("HeartRate");
-                    graph.setBackgroundColor(rgb(25, 0, 72));
-                    series.setColor(rgb(255, 255, 0));
+                    graph.setBackgroundColor(rgb(34, 34, 59));
+                    series.setColor(rgb(0, 255, 0));
                     gridLabel.setHorizontalLabelsVisible(true);
                     gridLabel.setVerticalLabelsVisible(true);
                     gridLabel.setHumanRounding(true);
@@ -96,20 +94,8 @@ public class HomeFragment extends Fragment {
 
         LineGraphSeries<DataPoint> hammock = new LineGraphSeries<DataPoint> (paintIdealPattern(1));
 
-        graph.getViewport().setMaxX(graphMaxX);
-        graph.getViewport().setMaxY(graphMaxY);
-        graph.getViewport().setMinY(0);
-        graph.getGridLabelRenderer().setPadding(60);
-        GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
-        gridLabel.setHorizontalAxisTitle("Time");
-        gridLabel.setVerticalAxisTitle("HeartRate");
-        graph.setBackgroundColor(rgb(34,34,59));
-        series.setColor(rgb(0,255,0));
-        gridLabel.setHorizontalLabelsVisible(true);
-        gridLabel.setVerticalLabelsVisible(true);
-        gridLabel.setHumanRounding(true);
-        graph.setVisibility(View.VISIBLE);
-
+        //TODO: Move paint code into graph creation scope
+        /*
         Paint paint = new Paint();
         paint.setColor(rgb(0,255,0));
         paint.setStyle(Paint.Style.STROKE);
@@ -122,6 +108,8 @@ public class HomeFragment extends Fragment {
         graph.addSeries(hammock);
         this.getNightResultFromServer();
         graph = root.findViewById(R.id.graph);
+
+         */
 
 
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
