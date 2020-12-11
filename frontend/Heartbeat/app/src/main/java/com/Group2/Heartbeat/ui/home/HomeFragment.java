@@ -1,6 +1,8 @@
 package com.Group2.Heartbeat.ui.home;
 
 import android.content.SharedPreferences;
+import android.graphics.DashPathEffect;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +27,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 public class HomeFragment extends Fragment {
 
     private HomeViewModel homeViewModel;
-
+    int recognisedPattern;
     String welcomemessage;
     String username;
     public static final String SHARED_PREFS = "sharedPrefs";
@@ -52,6 +54,8 @@ public class HomeFragment extends Fragment {
                 new DataPoint(4, 58)
         });
 
+        LineGraphSeries<DataPoint> hammock = new LineGraphSeries<DataPoint> (paintIdealPattern(1));
+
         graph.getViewport().setMaxX(graphMaxX);
         graph.getViewport().setMaxY(graphMaxY);
         graph.getViewport().setMinY(0);
@@ -59,13 +63,23 @@ public class HomeFragment extends Fragment {
         GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
         gridLabel.setHorizontalAxisTitle("Time");
         gridLabel.setVerticalAxisTitle("HeartRate");
-        graph.setBackgroundColor(rgb(25,0,72));
-        series.setColor(rgb(255,255,0));
+        graph.setBackgroundColor(rgb(34,34,59));
+        series.setColor(rgb(0,255,0));
         gridLabel.setHorizontalLabelsVisible(true);
         gridLabel.setVerticalLabelsVisible(true);
         gridLabel.setHumanRounding(true);
         graph.setVisibility(View.VISIBLE);
+
+        Paint paint = new Paint();
+        paint.setColor(rgb(0,255,0));
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(10);
+        paint.setPathEffect(new DashPathEffect(new float[]{25, 35}, 35));
+
+        hammock.setCustomPaint(paint);
+
         graph.addSeries(series);
+        graph.addSeries(hammock);
 
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
@@ -89,6 +103,78 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
+    public DataPoint[] paintIdealPattern(int recognisedPattern){
+
+        /*
+        LineGraphSeries<DataPoint> hllPattern = new LineGraphSeries<DataPoint>(new DataPoint[] {
+                new DataPoint(0, 50),
+                new DataPoint(1, 60),
+                new DataPoint(2, 65),
+                new DataPoint(3, 60),
+                new DataPoint(4, 50)
+        });
+        */
+
+        DataPoint[] hillPattern = {
+                new DataPoint(0, 50),
+                new DataPoint(1, 60),
+                new DataPoint(2, 65),
+                new DataPoint(3, 60),
+                new DataPoint(4, 50)
+        };
+
+        /*
+        LineGraphSeries<DataPoint> hammockPattern = new LineGraphSeries<DataPoint>(new DataPoint[] {
+                new DataPoint(0, 65),
+                new DataPoint(1, 60),
+                new DataPoint(2, 50),
+                new DataPoint(3, 60),
+                new DataPoint(4, 65)
+        });
+        */
+
+        DataPoint[] hammockPattern = {
+                new DataPoint(0, 65),
+                new DataPoint(1, 60),
+                new DataPoint(2, 50),
+                new DataPoint(3, 60),
+                new DataPoint(4, 65)
+        };
+
+        /*
+        LineGraphSeries<DataPoint> othrPattern = new LineGraphSeries<DataPoint>(new DataPoint[] {
+                new DataPoint(0, 40),
+                new DataPoint(1, 35),
+                new DataPoint(2, 60),
+                new DataPoint(3, 35),
+                new DataPoint(4, 40)
+        });
+
+         */
+
+        DataPoint[] otherPattern = {
+                new DataPoint(0, 40),
+                new DataPoint(1, 35),
+                new DataPoint(2, 60),
+                new DataPoint(3, 35),
+                new DataPoint(4, 40)
+        };
+
+        if (recognisedPattern == 0){
+
+            return hillPattern;
+        }
+        else if (recognisedPattern == 1){
+
+            return hammockPattern;
+        }
+        else if (recognisedPattern == 2){
+
+            return otherPattern;
+        }
+
+        return null;
+    }
     public void loadData() {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         username = sharedPreferences.getString(NAME, "");
