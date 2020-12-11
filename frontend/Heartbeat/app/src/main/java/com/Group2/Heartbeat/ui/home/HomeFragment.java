@@ -14,6 +14,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import static android.content.Context.MODE_PRIVATE;
+import static android.graphics.Color.rgb;
 
 import com.Group2.Heartbeat.R;
 import com.jjoe64.graphview.GraphView;
@@ -38,30 +39,31 @@ public class HomeFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         final TextView textView = root.findViewById(R.id.text_home);
         final TextView textView2 = root.findViewById(R.id.textHomeMain);
+
+        //all code for initialising the graphview and plotting some points
         final GraphView graph = root.findViewById(R.id.graph);
-        int graphMaxY = 10;
+        int graphMaxY = 150;
         int graphMaxX = 10;
         LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[] {
-                new DataPoint(0, 1),
-                new DataPoint(1, 5),
-                new DataPoint(2, 3),
-                new DataPoint(3, 2),
-                new DataPoint(4, 6)
+                new DataPoint(0, 60),
+                new DataPoint(1, 69),
+                new DataPoint(2, 81),
+                new DataPoint(3, 82),
+                new DataPoint(4, 58)
         });
 
-        graph.addSeries(series);
         graph.getViewport().setMaxX(graphMaxX);
         graph.getViewport().setMaxY(graphMaxY);
         GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
         gridLabel.setHorizontalAxisTitle("Time");
-        graph.getGridLabelRenderer().setHorizontalAxisTitle("Time");
         gridLabel.setVerticalAxisTitle("HeartRate");
-        graph.getGridLabelRenderer().setVerticalAxisTitle("HeartRate");
+        graph.setBackgroundColor(rgb(255,0,255));
+        series.setColor(rgb(255,255,0));
         gridLabel.setHorizontalLabelsVisible(true);
         gridLabel.setVerticalLabelsVisible(true);
-        graph.getGridLabelRenderer().setGridStyle(GridLabelRenderer.GridStyle.BOTH);
         gridLabel.setHumanRounding(true);
         graph.setVisibility(View.VISIBLE);
+        graph.addSeries(series);
 
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
