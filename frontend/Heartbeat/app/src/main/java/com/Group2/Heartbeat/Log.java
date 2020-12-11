@@ -20,6 +20,13 @@ public class Log {
         this.sleepSession = sleepSession;
     }
 
+    public Log(String date, int heartRate, long userID, long sleepSession) {
+        this.date = date;
+        this.heartRate = heartRate;
+        this.userID = userID;
+        this.sleepSession = sleepSession;
+    }
+
     public long getId() {
         return id;
     }
