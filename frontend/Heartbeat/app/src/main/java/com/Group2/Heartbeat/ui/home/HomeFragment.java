@@ -54,10 +54,12 @@ public class HomeFragment extends Fragment {
 
         graph.getViewport().setMaxX(graphMaxX);
         graph.getViewport().setMaxY(graphMaxY);
+        graph.getViewport().setMinY(0);
+        graph.getGridLabelRenderer().setPadding(60);
         GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
         gridLabel.setHorizontalAxisTitle("Time");
         gridLabel.setVerticalAxisTitle("HeartRate");
-        graph.setBackgroundColor(rgb(255,0,255));
+        graph.setBackgroundColor(rgb(25,0,72));
         series.setColor(rgb(255,255,0));
         gridLabel.setHorizontalLabelsVisible(true);
         gridLabel.setVerticalLabelsVisible(true);
