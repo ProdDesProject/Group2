@@ -18,20 +18,38 @@ import androidx.lifecycle.ViewModelProvider;
 import static android.content.Context.MODE_PRIVATE;
 import static android.graphics.Color.rgb;
 
+import com.Group2.Heartbeat.Log;
+import com.Group2.Heartbeat.NightResult;
 import com.Group2.Heartbeat.R;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.GridLabelRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import org.json.JSONObject;
+
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 public class HomeFragment extends Fragment {
 
     private HomeViewModel homeViewModel;
     int recognisedPattern;
+    private Gson gson = new Gson();
     String welcomemessage;
     String username;
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String NAME = "name";
+    NightResult nightResult;
+    GraphView graph;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -42,16 +60,38 @@ public class HomeFragment extends Fragment {
         final TextView textView = root.findViewById(R.id.text_home);
         final TextView textView2 = root.findViewById(R.id.textHomeMain);
 
-        //all code for initialising the graphview and plotting some points
-        final GraphView graph = root.findViewById(R.id.graph);
-        int graphMaxY = 150;
-        int graphMaxX = 10;
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[] {
-                new DataPoint(0, 60),
-                new DataPoint(1, 69),
-                new DataPoint(2, 81),
-                new DataPoint(3, 82),
-                new DataPoint(4, 58)
+        homeViewModel.nightResult.observe(getViewLifecycleOwner(), new Observer<NightResult>() {
+            @Override
+            public void onChanged(@Nullable NightResult result) {
+                nightResult = result;
+                if (nightResult.getUserId() >= 0) {
+                    final int[] graphMaxY = {0};
+                    Log[] logs = nightResult.getLogs();
+                    DataPoint[] dataPoints = new DataPoint[logs.length];
+                    IntStream.range(0, logs.length)
+                            .peek(i -> {if (i > graphMaxY[0]) graphMaxY[0] = i;})
+                            .forEach(i -> dataPoints[i] = new DataPoint(i, logs[i].getHeartRate()));
+
+                    LineGraphSeries<DataPoint> series = new LineGraphSeries<>(dataPoints);
+                    int graphMaxX = dataPoints.length;
+                    System.out.println("graphX" + graphMaxX);
+                    System.out.println("graphY" + graphMaxY[0]);
+                    graph.getViewport().setMaxX(graphMaxX);
+                    graph.getViewport().setMaxY(graphMaxY[0]);
+                    graph.getViewport().setMinY(0);
+                    graph.getGridLabelRenderer().setPadding(60);
+                    GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
+                    gridLabel.setHorizontalAxisTitle("Time");
+                    gridLabel.setVerticalAxisTitle("HeartRate");
+                    graph.setBackgroundColor(rgb(25, 0, 72));
+                    series.setColor(rgb(255, 255, 0));
+                    gridLabel.setHorizontalLabelsVisible(true);
+                    gridLabel.setVerticalLabelsVisible(true);
+                    gridLabel.setHumanRounding(true);
+                    graph.setVisibility(View.VISIBLE);
+                    graph.addSeries(series);
+                }
+            }
         });
 
         LineGraphSeries<DataPoint> hammock = new LineGraphSeries<DataPoint> (paintIdealPattern(1));
@@ -80,6 +120,9 @@ public class HomeFragment extends Fragment {
 
         graph.addSeries(series);
         graph.addSeries(hammock);
+        this.getNightResultFromServer();
+        graph = root.findViewById(R.id.graph);
+
 
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
@@ -99,6 +142,7 @@ public class HomeFragment extends Fragment {
         TextView welcomeText = root.findViewById(R.id.welcomeText);
         welcomemessage = "Hi, " + username.toString();
         welcomeText.setText(welcomemessage);
+
 
         return root;
     }
@@ -179,4 +223,39 @@ public class HomeFragment extends Fragment {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         username = sharedPreferences.getString(NAME, "");
     }
+
+    private void getNightResultFromServer() {
+
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(getContext());
+        String url = "http://192.168.42.21:8080/results/get/test";
+
+        // Request a string response from the provided URL.
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    NightResult nightResult = gson.fromJson(String.valueOf(response), NightResult.class);
+                    homeViewModel.nightResult.setValue(nightResult);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+//                setRestMessage("That didn't work!");
+                System.out.println("error code: " + error.networkResponse.statusCode);
+                System.out.println("error: " + error.networkResponse.data.toString());
+            }
+        });
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonRequest);
+
+    }
+
+
 }
