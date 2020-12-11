@@ -57,6 +57,7 @@ public class LogController {
      */
     @PostMapping("new/log")
     public ResponseEntity<Log> newLog(@Valid @RequestBody LogDTO logDTO) {
+        System.out.println("Log arrived");
         return new ResponseEntity<>(logService.newLog(logDTO), HttpStatus.OK);
     }
 
