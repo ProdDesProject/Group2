@@ -10,7 +10,7 @@ public class SleepHistViewModel extends ViewModel {
 
     public SleepHistViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is the Sleep History page");
+        mText.setValue("14th Dec 2020");
     }
 
     public LiveData<String> getText() {

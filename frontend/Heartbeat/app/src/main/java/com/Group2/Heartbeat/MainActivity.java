@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
                     if (!isConnected && !isConnecting) {
                         Snackbar.make(view, "Connecting...", Snackbar.LENGTH_LONG).show();
                         connect();
-                        fab.setImageResource(android.R.drawable.ic_input_delete);
+                        fab.setImageResource(android.R.drawable.ic_delete);
                     } else if (isConnected){
                         Snackbar.make(view, "Disconnecting...", Snackbar.LENGTH_LONG).show();
                         disconnect();
