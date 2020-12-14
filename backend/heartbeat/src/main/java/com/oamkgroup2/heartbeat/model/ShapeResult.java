@@ -5,6 +5,5 @@ package com.oamkgroup2.heartbeat.model;
  * tells us how good the nights' sleep was.
  */
 public enum ShapeResult {
-    HAMMOCK, HILL, CURVE, // TODO: check these values
-    UNDEFINED
+    HAMMOCK, HILL, CURVE, UNDEFINED
 }
