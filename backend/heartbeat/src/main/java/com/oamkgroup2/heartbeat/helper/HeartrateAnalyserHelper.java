@@ -1,9 +1,13 @@
 package com.oamkgroup2.heartbeat.helper;
 
-import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import com.oamkgroup2.heartbeat.model.ShapeResult;
+import com.oamkgroup2.heartbeat.model.Log;
 
 public class HeartrateAnalyserHelper {
+
+    private HeartrateAnalyserHelper() {
+    };
+
     // Taking average of the values
     private static int averageData(int[] a) {
         int total = 0;
@@ -17,7 +21,7 @@ public class HeartrateAnalyserHelper {
     }
 
     // just checking the type of the array
-    public static ShapeResult checkShape(int inputArray[]) {
+    public static ShapeResult checkShape(Log inputArray[]) {
         int arrayLength = inputArray.length;
 
         int firstThird = 0;
@@ -47,11 +51,11 @@ public class HeartrateAnalyserHelper {
 
         for (int i = 0; i < inputArray.length; i++) {
             if (i < firstThird) {
-                firstThirdArray[i] = inputArray[i];
+                firstThirdArray[i] = inputArray[i].getHeartRate();
             } else if (i < secondThird) {
-                secondThirdArray[i - firstThird] = inputArray[i];
+                secondThirdArray[i - firstThird] = inputArray[i].getHeartRate();
             } else {
-                thirdThirdArray[i - secondThird] = inputArray[i];
+                thirdThirdArray[i - secondThird] = inputArray[i].getHeartRate();
             }
         }
 

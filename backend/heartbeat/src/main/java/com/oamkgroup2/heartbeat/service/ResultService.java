@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.oamkgroup2.heartbeat.exception.EntityNotFoundException;
 import com.oamkgroup2.heartbeat.model.Log;
+import com.oamkgroup2.heartbeat.helper.HeartrateAnalyserHelper;
 
 @Service
 public class ResultService {
@@ -35,7 +36,8 @@ public class ResultService {
             result.setShape(ShapeResult.UNDEFINED);
             Log[] lastNight = this.logRepository.findAll().toArray(new Log[0]);
             result.setLogs(lastNight);
-            // TODO: analyze ShapeResult
+            result.setShape(HeartrateAnalyserHelper.checkShape(lastNight));
+
             if (lastNight.length > 0) {
                 return result;
             }
