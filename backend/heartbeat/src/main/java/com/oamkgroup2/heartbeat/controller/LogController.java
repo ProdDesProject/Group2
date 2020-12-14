@@ -1,6 +1,7 @@
 package com.oamkgroup2.heartbeat.controller;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.validation.Valid;
 
@@ -29,6 +30,7 @@ public class LogController {
 
     @Autowired
     private LogService logService;
+    private static final Logger LOG = Logger.getLogger(LogController.class.getName());
 
     /**
      * Get all logs. Only for testing purposes
@@ -57,6 +59,7 @@ public class LogController {
      */
     @PostMapping("new/log")
     public ResponseEntity<Log> newLog(@Valid @RequestBody LogDTO logDTO) {
+        LOG.info("log received");
         return new ResponseEntity<>(logService.newLog(logDTO), HttpStatus.OK);
     }
 
