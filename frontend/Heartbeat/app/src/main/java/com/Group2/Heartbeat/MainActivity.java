@@ -21,13 +21,28 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import polar.com.sdk.api.PolarBleApi;
 import polar.com.sdk.api.PolarBleApiCallback;
 import polar.com.sdk.api.PolarBleApiDefaultImpl;
 import polar.com.sdk.api.model.PolarDeviceInfo;
 import polar.com.sdk.api.model.PolarHrData;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import com.google.gson.*;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     PolarBleApi api;
     String DEVICE_ID = "50924E2C";  //Note: SET OWN DEVICE ID OR USE SCAN FUNCTIONALITY
     int heartRate = 0;
+    int timer;
 
     boolean isConnected;
     boolean isConnecting;
@@ -47,8 +63,13 @@ public class MainActivity extends AppCompatActivity {
     public static final String NAME = "name";
     public static final String EMAIL = "email";
 
+    private Gson gson;
+
+    private static String restMessage = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -83,6 +104,11 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        // Create the necessary variables for posting
+        String PostUrl = "http://192.168.42.21:8080/logs/new/log";
+        RequestQueue queue2 = Volley.newRequestQueue(MainActivity.this);
+
 
         api.setApiCallback(new PolarBleApiCallback() {
             @Override
@@ -121,6 +147,40 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("MyApp", "HR: " + data.hr);
                 heartRate = data.hr;
 
+                timer = timer + 1;
+
+                if (timer >= 5) {
+                    // Initialise the log to be sent
+                    JSONObject json = new JSONObject();
+                    LocalDateTime time = LocalDateTime.now();
+                    ZoneId zoneId = ZoneId.systemDefault(); // or: ZoneId.of("Europe/Oslo");
+                    long epoch = time.atZone(zoneId).toEpochSecond() * 1000;
+                    try {
+                        json.put("epochDate", epoch);
+                        json.put("heartRate", heartRate);
+                        json.put("userId", 0);
+                        json.put("sleepSession", 0);
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, PostUrl, json, new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            System.out.println(response);
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            error.printStackTrace();
+                        }
+                    });
+
+                    queue2.add(jsonObjectRequest);
+                    timer = 0;
+                }
             }
         });
 
@@ -146,6 +206,49 @@ public class MainActivity extends AppCompatActivity {
         nav_header_title.setText(username);
         TextView nav_header_subtitle = headerView.findViewById(R.id.textView);
         nav_header_subtitle.setText(useremail);
+
+//        //creation of gson objects for parsing rest response
+//        GsonBuilder gsonBuilder = new GsonBuilder();
+//        gson = gsonBuilder.create();
+//
+//        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
+//        String url = "http://192.168.56.1:8080/results/get/test";
+//
+//        // Request a string response from the provided URL.
+//        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+//
+//
+//            @Override
+//            public void onResponse(JSONObject response) {
+//                try {
+//                    // Display the first 500 characters of the response string.
+//                    setRestMessage("Response is: " +response);
+//                    System.out.println(response);
+//
+//                    NightResult nightResults = gson.fromJson(response.toString(), NightResult.class);
+//
+//                    for (com.Group2.Heartbeat.Log log: nightResults.getLogs()) {
+//
+//                        System.out.println(log.getHeartRate());
+//                    };
+//
+//                } catch (Exception e) {
+//                    System.out.println(e.getMessage());
+//                }
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                setRestMessage("That didn't work!");
+//                System.out.println(error.getMessage());
+//            }
+//        });
+//
+//        // Add the request to the RequestQueue.
+//        queue.add(jsonRequest);
+
+
     }
 
     @Override
@@ -216,6 +319,16 @@ public class MainActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
         api.shutDown();
+    }
+
+    //gets static restMessage value
+    public static String getRestMessage() {
+        return restMessage;
+    }
+
+    //sets the static restMessage value
+    public static void setRestMessage(String restMessage) {
+        MainActivity.restMessage = restMessage;
     }
 
 }
