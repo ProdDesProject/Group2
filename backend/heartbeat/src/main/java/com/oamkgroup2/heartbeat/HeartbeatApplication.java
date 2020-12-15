@@ -62,6 +62,7 @@ public class HeartbeatApplication {
 				repository.save(log);
 			}
 
+
 			for (int i = 0; i < arrDownwardSlope.length; i++) {
 				Log log = new Log();
 				log.setUserId(1L);

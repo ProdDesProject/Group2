@@ -1,6 +1,7 @@
 package com.oamkgroup2.heartbeat.controller;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.validation.Valid;
 
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -29,6 +31,7 @@ public class LogController {
 
     @Autowired
     private LogService logService;
+    private static final Logger LOG = Logger.getLogger(LogController.class.getName());
 
     /**
      * Get all logs. Only for testing purposes
@@ -46,8 +49,10 @@ public class LogController {
      * @throws EntityNotFoundException
      */
     @GetMapping("/sleepsession/latest")
-    public ResponseEntity<Long> getLatestSleepSession(@RequestBody Long userId) throws EntityNotFoundException {
-        return new ResponseEntity<>(logService.getLatestSleepSession(userId), HttpStatus.OK);
+    public ResponseEntity<String> getLatestSleepSession(@RequestParam(name = "userId") Long userId)
+            throws EntityNotFoundException {
+        String response = "{sleepsession: " + logService.getLatestSleepSession(userId) + "}";
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**
@@ -57,6 +62,7 @@ public class LogController {
      */
     @PostMapping("new/log")
     public ResponseEntity<Log> newLog(@Valid @RequestBody LogDTO logDTO) {
+        LOG.info("log received");
         return new ResponseEntity<>(logService.newLog(logDTO), HttpStatus.OK);
     }
 

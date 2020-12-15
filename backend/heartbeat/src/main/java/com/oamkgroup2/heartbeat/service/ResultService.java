@@ -1,5 +1,7 @@
 package com.oamkgroup2.heartbeat.service;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.logging.Logger;
 
 import com.oamkgroup2.heartbeat.model.NightResult;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.oamkgroup2.heartbeat.exception.EntityNotFoundException;
 import com.oamkgroup2.heartbeat.model.Log;
+import com.oamkgroup2.heartbeat.helper.HeartrateAnalyserHelper;
 
 @Service
 public class ResultService {
@@ -33,10 +36,18 @@ public class ResultService {
             NightResult result = new NightResult();
             result.setUserId(userId);
             result.setShape(ShapeResult.UNDEFINED);
-            Log[] lastNight = this.logRepository.findLastNightLogsForUser(userId);
+            Log[] lastNight = this.logRepository.findAll().toArray(new Log[0]);
             result.setLogs(lastNight);
-            // TODO: analyze ShapeResult
+            result.setShape(HeartrateAnalyserHelper.checkShape(lastNight));
+
             if (lastNight.length > 0) {
+                int year = lastNight[0].getDate().getYear();
+                Month month = lastNight[0].getDate().getMonth();
+                int day = lastNight[0].getDate().getDayOfMonth();
+                System.out.println("year" + year + "month" + month + "day" + day);
+                LocalDate date = LocalDate.of(year, month, day);
+                result.setNightStartDate(date);
+                System.out.println(("nightResult start date: " + result.getNightStartDate()));
                 return result;
             }
             throw new EntityNotFoundException("logs for user with id: " + userId);
@@ -50,7 +61,7 @@ public class ResultService {
      * @throws EntityNotFoundException
      */
     public NightResult getTestResult() throws EntityNotFoundException {
-        return this.getLatestResult(0);
+        return this.getLatestResult(1);
     }
 
     /**

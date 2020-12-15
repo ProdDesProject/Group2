@@ -67,7 +67,7 @@ public class LogService {
             long[] sleepSessions = logRepository.findTopSleepSessionsForUser(userId);
             LOG.info("sleepsession length: " + sleepSessions.length);
             if (sleepSessions.length > 0) {
-                return sleepSessions[0] + 1;
+                return sleepSessions[0];
             }
             return 0;
         }
