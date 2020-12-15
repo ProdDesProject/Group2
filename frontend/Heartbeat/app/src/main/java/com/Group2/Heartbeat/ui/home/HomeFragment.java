@@ -176,28 +176,30 @@ public class HomeFragment extends Fragment {
 
         DataPoint[] hammockPattern = {
                 new DataPoint(0, 85),
+                new DataPoint((quarterLog / 2), (60 + 85) / 2),
                 new DataPoint(quarterLog, 60),
+                new DataPoint(((quarterLog + middleLog) / 2), (60 + 40) / 2),
                 new DataPoint(middleLog, 40),
+                new DataPoint(((middleLog + thirdQuarterLog) / 2), (40 + 60) / 2),
                 new DataPoint(thirdQuarterLog, 60),
+                new DataPoint(((thirdQuarterLog + logs.length) / 2), (60 + 85) / 2),
                 new DataPoint((logs.length - 1), 85)
         };
 
         DataPoint[] curvePattern = {
                 new DataPoint(0, 120),
+                new DataPoint((quarterLog / 2), (120 + 100) / 2),
                 new DataPoint(quarterLog, 100),
+                new DataPoint(((quarterLog + middleLog) / 2), (100 + 85) / 2),
                 new DataPoint(middleLog, 85),
+                new DataPoint(((middleLog + thirdQuarterLog) / 2), (85 + 65) / 2),
                 new DataPoint(thirdQuarterLog, 65),
+                new DataPoint(((thirdQuarterLog + logs.length) / 2), (50 + 65) / 2),
                 new DataPoint((logs.length - 1), 50)
         };
 
         DataPoint[] undefinedPattern = {
                 new DataPoint(0, 0),
-                new DataPoint(10, 20),
-                new DataPoint(20, 0),
-                new DataPoint(30, 30),
-                new DataPoint(40, 0),
-                new DataPoint(50, 40),
-                new DataPoint(60, 0),
         };
 
 
@@ -218,6 +220,7 @@ public class HomeFragment extends Fragment {
             return hillPattern;
         }
 
+        System.out.println("Did not receive recognised pattern from server");
         return null;
     }
     public void loadData() {
