@@ -39,7 +39,7 @@ public class HeartbeatApplication {
 				Log log = new Log();
 				log.setUserId(1L);
 				LocalDateTime time = LocalDateTime.of(2020, Month.NOVEMBER, 25, 2, 0, 0);
-				time = time.plusMinutes((long) i);
+				time = time.plusHours((long) i);
 				log.setDate(time);
 				log.setHeartRate(i);
 				log.setSleepSession(i);

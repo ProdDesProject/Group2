@@ -35,6 +35,9 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 
 import org.json.JSONObject;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -59,12 +62,15 @@ public class HomeFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         final TextView textView = root.findViewById(R.id.text_home);
         final TextView textView2 = root.findViewById(R.id.textHomeMain);
+        TextView welcomeText = root.findViewById(R.id.welcomeText);
 
         homeViewModel.nightResult.observe(getViewLifecycleOwner(), new Observer<NightResult>() {
             @Override
             public void onChanged(@Nullable NightResult result) {
+
                 System.out.println("onchange!!!!!!!!!!!!!!!!");
                 nightResult = result;
+
                 if (nightResult.getUserId() >= 0) {
                     final int[] graphMaxY = {0};
                     Log[] logs = nightResult.getLogs();
@@ -74,17 +80,16 @@ public class HomeFragment extends Fragment {
                             .forEach(i -> dataPoints[i] = new DataPoint(i, logs[i].getHeartRate()));
 
                     LineGraphSeries<DataPoint> series = new LineGraphSeries<>(dataPoints);
-                    int graphMaxX = dataPoints.length;
                     System.out.println("datapoints: " + dataPoints.length);
-                    graph.getViewport().setMaxX(graphMaxX);
                     graph.getViewport().setMaxY(graphMaxY[0]);
                     graph.getViewport().setMinY(0);
-                    graph.getGridLabelRenderer().setPadding(60);
+                    graph.getGridLabelRenderer().setPadding(40);
                     GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
                     gridLabel.setHorizontalAxisTitle("Time");
                     gridLabel.setVerticalAxisTitle("HeartRate");
                     graph.setBackgroundColor(rgb(34, 34, 59));
                     series.setColor(rgb(0, 255, 0));
+                    series.setTitle("Last Night");
                     gridLabel.setHorizontalLabelsVisible(true);
                     gridLabel.setVerticalLabelsVisible(true);
                     gridLabel.setHumanRounding(true);
@@ -102,38 +107,43 @@ public class HomeFragment extends Fragment {
 
                     graph.addSeries(series);
                     graph.addSeries(hammock);
-                    graph.addSeries(series);
+
+                    Log[] lastNightLogs = nightResult.getLogs();
+                    LocalDateTime startOfSleep = toDateTime(lastNightLogs[0].getDate());
+                    LocalDateTime endOfSleep = toDateTime(lastNightLogs[lastNightLogs.length - 1].getDate());
+
+                    System.out.println(endOfSleep);
+                    double hoursSlept = ChronoUnit.HOURS.between(startOfSleep, endOfSleep);
+
+                    if (username.toString().length() > 1) {
+
+                        welcomemessage =    "Good Morning, " + username.toString() + ".\n\nYou slept for " + hoursSlept +
+                                            " hours last night.\n\n You fell asleep at " +
+                                            lastNightLogs[0].getDate().split("T")[1] + " and you woke up at "
+                                            + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1];
+
+                    }
+                    else {
+
+                        welcomemessage =    "Good Morning.\n\nYou slept for " + hoursSlept + " hours last night.\n\n You fell asleep at " +
+                                            lastNightLogs[0].getDate().split("T")[1] + " and you woke up at "
+                                            + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1];
+                    }
+
+                    welcomeText.setText(welcomemessage);
                 }
             }
         });
 
-
-
-        //TODO: Move paint code into graph creation scope
-        /*
-        Paint paint = new Paint();
-        paint.setColor(rgb(0,255,0));
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(10);
-        paint.setPathEffect(new DashPathEffect(new float[]{25, 35}, 35));
-
-        hammock.setCustomPaint(paint);
-
-        graph.addSeries(series);
-        graph.addSeries(hammock);
-        this.getNightResultFromServer();
-
-         */
-
         graph = root.findViewById(R.id.graph);
 
-        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        homeViewModel.mText.observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);
             }
         });
-        homeViewModel.getText2().observe(getViewLifecycleOwner(), new Observer<String>() {
+        homeViewModel.mainText.observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView2.setText(s);
@@ -143,14 +153,17 @@ public class HomeFragment extends Fragment {
         getNightResultFromServer();
         loadData();
 
-        TextView welcomeText = root.findViewById(R.id.welcomeText);
-        welcomemessage = "Hi, " + username.toString();
-        welcomeText.setText(welcomemessage);
-
-
         return root;
     }
 
+
+    /**
+     *
+     * A method for returning datapoints to construct a painted line for the graph.
+     *
+     * @param recognisedPattern Pattern recognised by code and returned from server
+     * @return Returns the datapoints to be included in the painted line
+     */
     public DataPoint[] paintIdealPattern(String recognisedPattern){
 
         nightResult.getShape();
@@ -223,10 +236,29 @@ public class HomeFragment extends Fragment {
         System.out.println("Did not receive recognised pattern from server");
         return null;
     }
+
+
     public void loadData() {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         username = sharedPreferences.getString(NAME, "");
     }
+
+
+    /**
+     * Converts Strings to LocalDateTime.
+     *
+     * @param stringStamp A string for each log which is provided by the server.
+     * @return Returns a  LocalDateTime which is formatted from the String provided.
+     */
+    public LocalDateTime toDateTime(String stringStamp){
+
+        String[] splitString = stringStamp.split("T");
+        String noTinString = splitString[0] + splitString[1];
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-ddHH:mm:ss");
+        LocalDateTime result = LocalDateTime.parse(noTinString, formatter);
+        return result;
+    }
+
 
     private void getNightResultFromServer() {
 
@@ -260,6 +292,4 @@ public class HomeFragment extends Fragment {
         queue.add(jsonRequest);
 
     }
-
-
 }
