@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Create the necessary variables for posting
-        String PostUrl = "http://192.168.56.1:8080/logs/new/log";
+        String PostUrl = "http://192.168.42.21:8080/logs/new/log";
         RequestQueue queue2 = Volley.newRequestQueue(MainActivity.this);
 
         api.setApiCallback(new PolarBleApiCallback() {
