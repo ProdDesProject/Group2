@@ -136,7 +136,6 @@ public class SleepHistFragment extends Fragment {
 
         LineGraphSeries<DataPoint> series = new LineGraphSeries<>(dataPoints);
         int graphMaxX = dataPoints.length;
-        System.out.println("datapoints: " + dataPoints.length);
         graph.getViewport().setMaxX(graphMaxX);
         graph.getViewport().setMaxY(graphMaxY[0]);
         graph.getViewport().setMinY(0);
@@ -150,6 +149,7 @@ public class SleepHistFragment extends Fragment {
         gridLabel.setVerticalLabelsVisible(true);
         gridLabel.setHumanRounding(true);
         graph.setVisibility(View.VISIBLE);
+        graph.removeAllSeries();
         graph.addSeries(series);
     }
 
