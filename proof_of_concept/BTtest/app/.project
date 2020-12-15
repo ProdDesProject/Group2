@@ -6,19 +6,17 @@
 	</projects>
 	<buildSpec>
 		<buildCommand>
-
 			<name>org.eclipse.buildship.core.gradleprojectbuilder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
 	</buildSpec>
 	<natures>
-
 		<nature>org.eclipse.buildship.core.gradleprojectnature</nature>
 	</natures>
 	<filteredResources>
 		<filter>
-			<id>1607694553451</id>
+			<id>1607612581999</id>
 			<name></name>
 			<type>30</type>
 			<matcher>
