@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                     if (!isConnected && !isConnecting) {
                         Snackbar.make(view, "Connecting...", Snackbar.LENGTH_LONG).show();
                         connect();
-                        fab.setImageResource(android.R.drawable.ic_input_delete);
+                        fab.setImageResource(android.R.drawable.ic_delete);
                     } else if (isConnected){
                         Snackbar.make(view, "Disconnecting...", Snackbar.LENGTH_LONG).show();
                         disconnect();
@@ -108,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
         // Create the necessary variables for posting
         String PostUrl = "http://192.168.56.1:8080/logs/new/log";
         RequestQueue queue2 = Volley.newRequestQueue(MainActivity.this);
-
 
         api.setApiCallback(new PolarBleApiCallback() {
             @Override
@@ -161,10 +160,10 @@ public class MainActivity extends AppCompatActivity {
                         json.put("userId", 0);
                         json.put("sleepSession", 0);
 
-
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    System.out.println(String.valueOf(json));
 
                     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, PostUrl, json, new Response.Listener<JSONObject>() {
                         @Override
@@ -213,40 +212,41 @@ public class MainActivity extends AppCompatActivity {
 //
 //        // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
-//        String url = "http://192.168.56.1:8080/results/get/test";
-//
-//        // Request a string response from the provided URL.
-//        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-//
-//
-//            @Override
-//            public void onResponse(JSONObject response) {
-//                try {
-//                    // Display the first 500 characters of the response string.
-//                    setRestMessage("Response is: " +response);
-//                    System.out.println(response);
-//
-//                    NightResult nightResults = gson.fromJson(response.toString(), NightResult.class);
-//
-//                    for (com.Group2.Heartbeat.Log log: nightResults.getLogs()) {
-//
-//                        System.out.println(log.getHeartRate());
-//                    };
-//
-//                } catch (Exception e) {
-//                    System.out.println(e.getMessage());
-//                }
-//            }
-//        }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                setRestMessage("That didn't work!");
-//                System.out.println(error.getMessage());
-//            }
-//        });
-//
-//        // Add the request to the RequestQueue.
-//        queue.add(jsonRequest);
+
+        String url = "http://192.168.42.21:8080/results/get/test";
+
+        // Request a string response from the provided URL.
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    // Display the first 500 characters of the response string.
+                    setRestMessage("Response is: " +response);
+                    System.out.println(response);
+
+                    NightResult nightResults = gson.fromJson(response.toString(), NightResult.class);
+
+                    for (com.Group2.Heartbeat.Log log: nightResults.getLogs()) {
+
+                        System.out.println(log.getHeartRate());
+                    };
+
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                setRestMessage("That didn't work!");
+                error.printStackTrace();
+            }
+        });
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonRequest);
 
 
     }
