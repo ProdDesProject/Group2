@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
 
                 timer = timer + 1;
 
-                if (timer >= 30) {
+                if (timer >= 5) {
                     // Initialise the log to be sent
                     JSONObject json = new JSONObject();
                     LocalDateTime time = LocalDateTime.now();
