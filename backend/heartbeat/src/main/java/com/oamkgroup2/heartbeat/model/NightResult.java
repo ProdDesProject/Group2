@@ -46,6 +46,7 @@ public class NightResult {
             int day = logs[0].getDate().getDayOfMonth();
             LocalDate date = LocalDate.of(year, month, day);
             this.nightStartDate = date;
+            System.out.println(("nightResult start date: " + this.nightStartDate));
         }
     }
 
@@ -74,6 +75,14 @@ public class NightResult {
 
     public void setLogs(Log[] logs) {
         this.logs = logs;
+    }
+
+    public LocalDate getNightStartDate() {
+        return nightStartDate;
+    }
+
+    public void setNightStartDate(LocalDate nightStartDate) {
+        this.nightStartDate = nightStartDate;
     }
 
 }

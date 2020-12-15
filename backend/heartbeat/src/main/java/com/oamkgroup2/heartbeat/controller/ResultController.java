@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -34,8 +35,8 @@ public class ResultController {
     }
 
     @GetMapping("/get/specific")
-    public ResponseEntity<NightResult> getSpecificNightResult(@RequestBody long userId, long sleepsession)
-            throws EntityNotFoundException {
+    public ResponseEntity<NightResult> getSpecificNightResult(@RequestParam(name = "userId") long userId,
+            @RequestParam(name = "sleepsession") long sleepsession) throws EntityNotFoundException {
         return new ResponseEntity<>(this.resultService.getSpecificResult(userId, sleepsession), HttpStatus.OK);
     }
 

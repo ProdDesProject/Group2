@@ -283,8 +283,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
 //                setRestMessage("That didn't work!");
-                System.out.println("error code: " + error.networkResponse.statusCode);
-                System.out.println("error: " + error.networkResponse.data.toString());
+                error.printStackTrace();
             }
         });
 
