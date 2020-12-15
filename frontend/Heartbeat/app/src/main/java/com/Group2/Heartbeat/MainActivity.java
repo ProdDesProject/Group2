@@ -213,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
 //        // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
 
-        String url = "http://a5c9ec5bc55f.ngrok.io/results/get/test";
+        String url = "http://192.168.42.21:8080/results/get/test";
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -241,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 setRestMessage("That didn't work!");
-                System.out.println(error.getMessage());
+                error.printStackTrace();
             }
         });
 

@@ -1,5 +1,7 @@
 package com.oamkgroup2.heartbeat.service;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.logging.Logger;
 
 import com.oamkgroup2.heartbeat.model.NightResult;
@@ -39,6 +41,13 @@ public class ResultService {
             result.setShape(HeartrateAnalyserHelper.checkShape(lastNight));
 
             if (lastNight.length > 0) {
+                int year = lastNight[0].getDate().getYear();
+                Month month = lastNight[0].getDate().getMonth();
+                int day = lastNight[0].getDate().getDayOfMonth();
+                System.out.println("year" + year + "month" + month + "day" + day);
+                LocalDate date = LocalDate.of(year, month, day);
+                result.setNightStartDate(date);
+                System.out.println(("nightResult start date: " + result.getNightStartDate()));
                 return result;
             }
             throw new EntityNotFoundException("logs for user with id: " + userId);

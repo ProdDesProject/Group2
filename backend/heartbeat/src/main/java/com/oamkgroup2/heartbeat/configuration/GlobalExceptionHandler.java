@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
     }
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
-        LOG.info("request rejected: " + apiError);
+        LOG.info("request rejected: " + apiError.getMessage());
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
 

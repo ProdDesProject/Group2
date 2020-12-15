@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -48,8 +49,10 @@ public class LogController {
      * @throws EntityNotFoundException
      */
     @GetMapping("/sleepsession/latest")
-    public ResponseEntity<Long> getLatestSleepSession(@RequestBody Long userId) throws EntityNotFoundException {
-        return new ResponseEntity<>(logService.getLatestSleepSession(userId), HttpStatus.OK);
+    public ResponseEntity<String> getLatestSleepSession(@RequestParam(name = "userId") Long userId)
+            throws EntityNotFoundException {
+        String response = "{sleepsession: " + logService.getLatestSleepSession(userId) + "}";
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**

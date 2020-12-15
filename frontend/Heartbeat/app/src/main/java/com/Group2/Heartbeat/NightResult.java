@@ -7,18 +7,16 @@ public class NightResult {
     private long userId;
     private String shape;
     private Log[] logs;
-    private LocalDate nightStartDate;
 
     public NightResult(){
 
     }
 
-    public NightResult(long userId, String shape, Log[] logs, LocalDate nightStartDate) {
+    public NightResult(long userId, String shape, Log[] logs) {
 
         this.setUserId(userId);
         this.setShape(shape);
         this.setLogs(logs);
-        this.setNightStartDate(nightStartDate);
     }
 
     public long getUserId() {
@@ -45,11 +43,4 @@ public class NightResult {
         this.logs = logs;
     }
 
-    public LocalDate getNightStartDate() {
-        return nightStartDate;
-    }
-
-    public void setNightStartDate(LocalDate nightStartDate) {
-        this.nightStartDate = nightStartDate;
-    }
 }
