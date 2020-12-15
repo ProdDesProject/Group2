@@ -18,4 +18,6 @@
     <string name="ProfileEmailLabel">Email:</string>
     <string name="ProfileAgeLabel">Age:</string>
     <string name="profile_submit">Submit</string>
+
+    <string name="histDate">14th Dec 2020</string>
 </resources>
