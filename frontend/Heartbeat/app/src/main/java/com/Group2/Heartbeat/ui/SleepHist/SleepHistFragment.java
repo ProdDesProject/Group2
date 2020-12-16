@@ -200,7 +200,7 @@ public class SleepHistFragment extends Fragment {
         graph.setVisibility(View.VISIBLE);
         graph.removeAllSeries();
         Paint paint = new Paint();
-        paint.setColor(rgb(0, 255, 0));
+        paint.setColor(rgb(255, 0, 0));
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(10);
         paint.setPathEffect(new DashPathEffect(new float[]{25, 35}, 0));
