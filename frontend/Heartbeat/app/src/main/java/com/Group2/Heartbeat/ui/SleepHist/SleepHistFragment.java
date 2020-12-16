@@ -27,18 +27,24 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
+import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.GridLabelRenderer;
+import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
 import org.json.JSONObject;
 
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.stream.IntStream;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -46,20 +52,20 @@ import static android.graphics.Color.rgb;
 
 public class SleepHistFragment extends Fragment {
 
+    public static final String SHARED_PREFS = "sharedPrefs";
+    public static final String NAME = "name";
     int dateOffset = 0;
     int latestSleepSession = -1;
     NightResult nightResult;
     LocalDate time = LocalDate.now();
     String currDate;
-    private SleepHistViewModel sleepHistViewModel;
-    private Gson gson = new Gson();
     TextView textView;
     String welcomeMessage;
     String username;
-    public static final String SHARED_PREFS = "sharedPrefs";
-    public static final String NAME = "name";
-
     GraphView graph;
+    Date[] dates;
+    private SleepHistViewModel sleepHistViewModel;
+    private Gson gson = new Gson();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -85,7 +91,7 @@ public class SleepHistFragment extends Fragment {
             public void onChanged(@Nullable NightResult result) {
                 nightResult = result;
                 currDate = nightResult.getLogs()[0].getDate();
-                currDate = currDate.substring(0, currDate.length()-9);
+                currDate = currDate.substring(0, currDate.length() - 9);
                 textView.setText(currDate);
                 drawGraph();
                 welcomeText.setText(getSleepExplanation());
@@ -103,7 +109,7 @@ public class SleepHistFragment extends Fragment {
         previousDayFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if ((latestSleepSession + dateOffset) < 0) {
+                if ((latestSleepSession + dateOffset) < 2) {
                     Snackbar.make(view, "No records for that date!", Snackbar.LENGTH_LONG).show();
                 } else {
                     dateOffset = dateOffset - 1;
@@ -120,10 +126,10 @@ public class SleepHistFragment extends Fragment {
                 if (dateOffset == 0) {
                     Snackbar.make(view, "Cannot go into the future", Snackbar.LENGTH_LONG).show();
                 } else {
-                        dateOffset = dateOffset + 1;
-                        getNightResultForSleepsession(latestSleepSession + dateOffset);
-                        // VISUALIZE Data
-                        System.out.println("dateoffset: " + dateOffset);
+                    dateOffset = dateOffset + 1;
+                    getNightResultForSleepsession(latestSleepSession + dateOffset);
+                    // VISUALIZE Data
+                    System.out.println("dateoffset: " + dateOffset);
                 }
             }
         });
@@ -143,20 +149,55 @@ public class SleepHistFragment extends Fragment {
         return date;
     }
 
-    private void drawGraph(){
+    private void drawGraph() {
         final int[] graphMaxY = {0};
+        final int[] graphMinY = {100};
         Log[] logs = nightResult.getLogs();
+        dates = new Date[logs.length];
         DataPoint[] dataPoints = new DataPoint[logs.length];
         IntStream.range(0, logs.length)
-                .peek(i -> {if (i > graphMaxY[0]) graphMaxY[0] = i;})
-                .forEach(i -> dataPoints[i] = new DataPoint(i, logs[i].getHeartRate()));
+                .peek(i -> {if (logs[i].getHeartRate() > graphMaxY[0]){
+                    graphMaxY[0] = logs[i].getHeartRate();
+                }})
+                .peek(i -> {
+                    if (logs[i].getHeartRate() < graphMinY[0]) {
+                        graphMinY[0] = logs[i].getHeartRate();
+                    }
+                })
+                .forEach(i -> {
+                    System.out.println("date before: " + logs[i].getDate());
+                    LocalDateTime time = this.toDateTime(logs[i].getDate());
+                    Date date = convertToDateViaInstant(time);
+                    System.out.println("date after: " + date);
+                    dates[i] = date;
+                    dataPoints[i] = new DataPoint(date, logs[i].getHeartRate());
+                });
+
+        graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
+            @Override
+            public String formatLabel(double value, boolean isValueX) {
+                if (isValueX) {
+                    Format formatter = new SimpleDateFormat("HH:mm:ss");
+                    return formatter.format(value);
+                }
+                return super.formatLabel(value, isValueX);
+            }
+        });
+        graph.getGridLabelRenderer().setNumHorizontalLabels(10); // only 4 because of the space
+        graph.getGridLabelRenderer().setHorizontalLabelsAngle(120);
 
         LineGraphSeries<DataPoint> series = new LineGraphSeries<>(dataPoints);
-        int graphMaxX = dataPoints.length;
-        graph.getViewport().setMaxX(graphMaxX);
-        graph.getViewport().setMaxY(graphMaxY[0]);
-        graph.getViewport().setMinY(0);
-        graph.getGridLabelRenderer().setPadding(60);
+        graph.getViewport().setMaxY(graphMaxY[0] + 10);
+        graph.getViewport().setMinY(graphMinY[0] - 10);
+        graph.getViewport().setYAxisBoundsManual(true);
+
+
+        // set manual x bounds to have nice steps
+        graph.getViewport().setMinX(dates[0].getTime());
+        graph.getViewport().setMaxX(dates[dates.length-1].getTime());
+        graph.getViewport().setXAxisBoundsManual(true);
+//        graph.getViewport().setMinY(0);
+        graph.getGridLabelRenderer().setPadding(40);
         GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
         gridLabel.setHorizontalAxisTitle("Time");
         gridLabel.setVerticalAxisTitle("HeartRate");
@@ -168,12 +209,12 @@ public class SleepHistFragment extends Fragment {
         graph.setVisibility(View.VISIBLE);
         graph.removeAllSeries();
         Paint paint = new Paint();
-        paint.setColor(rgb(0,255,0));
+        paint.setColor(rgb(0, 255, 0));
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(10);
         paint.setPathEffect(new DashPathEffect(new float[]{25, 35}, 0));
 
-        LineGraphSeries<DataPoint> idealPattern = new LineGraphSeries<DataPoint> (paintIdealPattern(nightResult.getShape()));
+        LineGraphSeries<DataPoint> idealPattern = new LineGraphSeries<DataPoint>(paintIdealPattern(nightResult.getShape()));
         System.out.println(nightResult.getShape());
 
         idealPattern.setCustomPaint(paint);
@@ -182,7 +223,13 @@ public class SleepHistFragment extends Fragment {
         graph.addSeries(series);
     }
 
-    public String getSleepExplanation(){
+    private Date convertToDateViaInstant(LocalDateTime dateToConvert) {
+        return java.util.Date
+                .from(dateToConvert.atZone(ZoneId.systemDefault())
+                        .toInstant());
+    }
+
+    public String getSleepExplanation() {
 
         Log[] lastNightLogs = nightResult.getLogs();
         LocalDateTime startOfSleep = toDateTime(lastNightLogs[0].getDate());
@@ -193,15 +240,14 @@ public class SleepHistFragment extends Fragment {
 
         if (username.length() > 1) {
 
-            return  "Good Morning, " + username + ".\n\nYou slept for " + hoursSlept +
+            return "Good Morning, " + username + ".\n\nYou slept for " + hoursSlept +
                     " hours last night.\n\n You fell asleep at " +
                     lastNightLogs[0].getDate().split("T")[1] + " and you woke up at "
                     + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1];
 
-        }
-        else {
+        } else {
 
-            return  "Good Morning.\n\nYou slept for " + hoursSlept + " hours last night.\n\n You fell asleep at " +
+            return "Good Morning.\n\nYou slept for " + hoursSlept + " hours last night.\n\n You fell asleep at " +
                     lastNightLogs[0].getDate().split("T")[1] + " and you woke up at "
                     + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1];
         }
@@ -213,7 +259,7 @@ public class SleepHistFragment extends Fragment {
     private void getLatestSleepSession() {
         try {
             RequestQueue queue = Volley.newRequestQueue(getContext());
-            String url = "http://192.168.56.1:8080/logs/sleepsession/latest?userId=1";
+            String url = "http://192.168.42.21:8080/logs/sleepsession/latest?userId=1";
 
             // Request a string response from the provided URL.
             JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -249,7 +295,7 @@ public class SleepHistFragment extends Fragment {
      * @param stringStamp A string for each log which is provided by the server.
      * @return Returns a  LocalDateTime which is formatted from the String provided.
      */
-    public LocalDateTime toDateTime(String stringStamp){
+    public LocalDateTime toDateTime(String stringStamp) {
 
         String[] splitString = stringStamp.split("T");
         String noTinString = splitString[0] + splitString[1];
@@ -260,13 +306,14 @@ public class SleepHistFragment extends Fragment {
 
     /**
      * Get the nightresult for a specific night. Currently hardcoded for user 1.
+     *
      * @param sleepSession identifier for the night its representing.
      */
     private void getNightResultForSleepsession(int sleepSession) {
         try {
             // Instantiate the RequestQueue.
             RequestQueue queue = Volley.newRequestQueue(getContext());
-            String url = "http://192.168.56.1:8080/results/get/specific?userId=1&sleepsession=" + sleepSession;
+            String url = "http://192.168.42.21:8080/results/get/specific?userId=1&sleepsession=" + sleepSession;
 
             // Request a string response from the provided URL.
             JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -299,13 +346,12 @@ public class SleepHistFragment extends Fragment {
     }
 
     /**
-     *
      * A method for returning datapoints to construct a painted line for the graph.
      *
      * @param recognisedPattern Pattern recognised by code and returned from server
      * @return Returns the datapoints to be included in the painted line
      */
-    public DataPoint[] paintIdealPattern(String recognisedPattern){
+    public DataPoint[] paintIdealPattern(String recognisedPattern) {
 
         nightResult.getShape();
         Log[] logs = nightResult.getLogs();
@@ -357,19 +403,18 @@ public class SleepHistFragment extends Fragment {
         };
 
 
-        if (recognisedPattern.equals("HILL")){
+        if (recognisedPattern.equals("HILL")) {
 
             return hillPattern;
-        }
-        else if (recognisedPattern.equals("HAMMOCK")){
+        } else if (recognisedPattern.equals("HAMMOCK")) {
 
             return hammockPattern;
         }
-        else if (recognisedPattern.equals("CURVE")) {
+//        else if (recognisedPattern.equals("CURVE")) {
+        else if (recognisedPattern.equals("SLOPE")) {
 
             return curvePattern;
-        }
-        else if (recognisedPattern.equals("UNDEFINED")){
+        } else if (recognisedPattern.equals("UNDEFINED")) {
 
             return hillPattern;
         }
