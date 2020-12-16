@@ -57,7 +57,7 @@ public class HomeFragment extends Fragment {
     private Date[] dates;
     private HomeViewModel homeViewModel;
     private final Gson gson = new Gson();
-    private final String URL = "http://192.168.42.21:8080";
+    private final String URL = "http://192.168.56.1:8080";
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
