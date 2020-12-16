@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Create the necessary variables for posting
-        String PostUrl = "http://192.168.56.1:8080/logs/new/log";
+        String PostUrl = "http://192.168.42.21:8080/logs/new/log";
         RequestQueue queue2 = Volley.newRequestQueue(MainActivity.this);
 
         api.setApiCallback(new PolarBleApiCallback() {
@@ -213,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
 //        // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
 
-        String url = "http://192.168.56.1:8080/results/get/test";
+        String url = "http://192.168.42.21:8080/results/get/test";
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {

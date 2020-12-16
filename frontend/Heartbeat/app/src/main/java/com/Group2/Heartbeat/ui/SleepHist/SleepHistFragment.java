@@ -30,7 +30,6 @@ import com.google.gson.Gson;
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.GridLabelRenderer;
-import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
@@ -156,19 +155,19 @@ public class SleepHistFragment extends Fragment {
         dates = new Date[logs.length];
         DataPoint[] dataPoints = new DataPoint[logs.length];
         IntStream.range(0, logs.length)
-                .peek(i -> {if (logs[i].getHeartRate() > graphMaxY[0]){
-                    graphMaxY[0] = logs[i].getHeartRate();
-                }})
+                .peek(i -> {
+                    if (logs[i].getHeartRate() > graphMaxY[0]) {
+                        graphMaxY[0] = logs[i].getHeartRate();
+                    }
+                })
                 .peek(i -> {
                     if (logs[i].getHeartRate() < graphMinY[0]) {
                         graphMinY[0] = logs[i].getHeartRate();
                     }
                 })
                 .forEach(i -> {
-                    System.out.println("date before: " + logs[i].getDate());
                     LocalDateTime time = this.toDateTime(logs[i].getDate());
                     Date date = convertToDateViaInstant(time);
-                    System.out.println("date after: " + date);
                     dates[i] = date;
                     dataPoints[i] = new DataPoint(date, logs[i].getHeartRate());
                 });
@@ -194,7 +193,7 @@ public class SleepHistFragment extends Fragment {
 
         // set manual x bounds to have nice steps
         graph.getViewport().setMinX(dates[0].getTime());
-        graph.getViewport().setMaxX(dates[dates.length-1].getTime());
+        graph.getViewport().setMaxX(dates[dates.length - 1].getTime());
         graph.getViewport().setXAxisBoundsManual(true);
 //        graph.getViewport().setMinY(0);
         graph.getGridLabelRenderer().setPadding(40);
@@ -240,14 +239,14 @@ public class SleepHistFragment extends Fragment {
 
         if (username.length() > 1) {
 
-            return  "\nGood Morning, " + username + ".\n\nYou slept for " + hoursSlept +
+            return "\nGood Morning, " + username + ".\n\nYou slept for " + hoursSlept +
                     " hours last night.\n\n You fell asleep at " +
                     lastNightLogs[0].getDate().split("T")[1] + " and you woke up at "
                     + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1];
 
         } else {
 
-            return  "\nGood Morning.\n\nYou slept for " + hoursSlept + " hours last night.\n\n You fell asleep at " +
+            return "\nGood Morning.\n\nYou slept for " + hoursSlept + " hours last night.\n\n You fell asleep at " +
                     lastNightLogs[0].getDate().split("T")[1] + " and you woke up at "
                     + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1];
         }
@@ -259,7 +258,7 @@ public class SleepHistFragment extends Fragment {
     private void getLatestSleepSession() {
         try {
             RequestQueue queue = Volley.newRequestQueue(getContext());
-            String url = "http://192.168.56.1:8080/logs/sleepsession/latest?userId=1";
+            String url = "http://192.168.42.21:8080/logs/sleepsession/latest?userId=1";
 
             // Request a string response from the provided URL.
             JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -313,7 +312,7 @@ public class SleepHistFragment extends Fragment {
         try {
             // Instantiate the RequestQueue.
             RequestQueue queue = Volley.newRequestQueue(getContext());
-            String url = "http://192.168.56.1:8080/results/get/specific?userId=1&sleepsession=" + sleepSession;
+            String url = "http://192.168.42.21:8080/results/get/specific?userId=1&sleepsession=" + sleepSession;
 
             // Request a string response from the provided URL.
             JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -352,74 +351,79 @@ public class SleepHistFragment extends Fragment {
      * @return Returns the datapoints to be included in the painted line
      */
     public DataPoint[] paintIdealPattern(String recognisedPattern) {
+        try {
+            if (dates.length > 0) {
+                nightResult.getShape();
+                Log[] logs = nightResult.getLogs();
 
-        nightResult.getShape();
-        Log[] logs = nightResult.getLogs();
-
-        int quarterLog = logs.length / 4;
-        int middleLog = logs.length / 2;
-        int thirdQuarterLog = quarterLog * 3;
-
-        int i = 0;
-
-        DataPoint[] hillPattern = {
-                new DataPoint(0, 55),
-                new DataPoint((quarterLog / 2), (77 + 55) / 2),
-                new DataPoint(quarterLog, 77),
-                new DataPoint(((quarterLog + middleLog) / 2), (100 + 77) / 2),
-                new DataPoint(middleLog, 100),
-                new DataPoint(((middleLog + thirdQuarterLog) / 2), (100 + 46) / 2),
-                new DataPoint(thirdQuarterLog, 46),
-                new DataPoint(((thirdQuarterLog + logs.length) / 2), (100 + 46) / 2),
-                new DataPoint((logs.length - 1), 80)
-        };
-
-        DataPoint[] hammockPattern = {
-                new DataPoint(0, 85),
-                new DataPoint((quarterLog / 2), (60 + 85) / 2),
-                new DataPoint(quarterLog, 60),
-                new DataPoint(((quarterLog + middleLog) / 2), (60 + 40) / 2),
-                new DataPoint(middleLog, 40),
-                new DataPoint(((middleLog + thirdQuarterLog) / 2), (40 + 60) / 2),
-                new DataPoint(thirdQuarterLog, 60),
-                new DataPoint(((thirdQuarterLog + logs.length) / 2), (60 + 85) / 2),
-                new DataPoint((logs.length - 1), 85)
-        };
-
-        DataPoint[] curvePattern = {
-                new DataPoint(0, 120),
-                new DataPoint((quarterLog / 2), (120 + 100) / 2),
-                new DataPoint(quarterLog, 100),
-                new DataPoint(((quarterLog + middleLog) / 2), (100 + 85) / 2),
-                new DataPoint(middleLog, 85),
-                new DataPoint(((middleLog + thirdQuarterLog) / 2), (85 + 65) / 2),
-                new DataPoint(thirdQuarterLog, 65),
-                new DataPoint(((thirdQuarterLog + logs.length) / 2), (50 + 65) / 2),
-                new DataPoint((logs.length - 1), 50)
-        };
-
-        DataPoint[] undefinedPattern = {
-                new DataPoint(0, 0),
-        };
+                int quarterLog = logs.length / 4;
+                int middleLog = logs.length / 2;
+                int thirdQuarterLog = quarterLog * 3;
 
 
-        if (recognisedPattern.equals("HILL")) {
+                DataPoint[] hillPattern = {
+                        new DataPoint(dates[0], 55),
+                        new DataPoint(dates[(quarterLog / 2)], (77 + 55) / 2),
+                        new DataPoint(dates[quarterLog], 77),
+                        new DataPoint(dates[((quarterLog + middleLog) / 2)], (100 + 77) / 2),
+                        new DataPoint(dates[middleLog], 100),
+                        new DataPoint(dates[((middleLog + thirdQuarterLog) / 2)], (100 + 46) / 2),
+                        new DataPoint(dates[thirdQuarterLog], 46),
+                        new DataPoint(dates[((thirdQuarterLog + logs.length) / 2)], (100 + 46) / 2),
+                        new DataPoint(dates[(logs.length - 1)], 80)
+                };
 
-            return hillPattern;
-        } else if (recognisedPattern.equals("HAMMOCK")) {
+                DataPoint[] hammockPattern = {
+                        new DataPoint(dates[0], 85),
+                        new DataPoint(dates[(quarterLog / 2)], (60 + 85) / 2),
+                        new DataPoint(dates[quarterLog], 60),
+                        new DataPoint(dates[((quarterLog + middleLog) / 2)], (60 + 40) / 2),
+                        new DataPoint(dates[middleLog], 40),
+                        new DataPoint(dates[((middleLog + thirdQuarterLog) / 2)], (40 + 60) / 2),
+                        new DataPoint(dates[thirdQuarterLog], 60),
+                        new DataPoint(dates[((thirdQuarterLog + logs.length) / 2)], (60 + 85) / 2),
+                        new DataPoint(dates[(logs.length - 1)], 85)
+                };
 
-            return hammockPattern;
+                DataPoint[] curvePattern = {
+                        new DataPoint(dates[0], 120),
+                        new DataPoint(dates[(quarterLog / 2)], (120 + 100) / 2),
+                        new DataPoint(dates[quarterLog], 100),
+                        new DataPoint(dates[((quarterLog + middleLog) / 2)], (100 + 85) / 2),
+                        new DataPoint(dates[middleLog], 85),
+                        new DataPoint(dates[((middleLog + thirdQuarterLog) / 2)], (85 + 65) / 2),
+                        new DataPoint(dates[thirdQuarterLog], 65),
+                        new DataPoint(dates[((thirdQuarterLog + logs.length) / 2)], (50 + 65) / 2),
+                        new DataPoint((logs.length - 1), 50)
+                };
+
+                DataPoint[] undefinedPattern = {
+                        new DataPoint(dates[0], 0),
+                };
+
+
+                if (recognisedPattern.equals("HILL")) {
+
+                    return hillPattern;
+                } else if (recognisedPattern.equals("HAMMOCK")) {
+
+                    return hammockPattern;
+                } else if (recognisedPattern.equals("CURVE")) {
+
+                    return curvePattern;
+                } else if (recognisedPattern.equals("UNDEFINED")) {
+
+                    return hillPattern;
+                }
+
+                System.out.println("Did not receive recognised pattern from server");
+                return null;
+            }
+        } catch (NullPointerException e) {
+            System.out.println("ideal pattern error: DATES NOT SET");
         }
-//        else if (recognisedPattern.equals("CURVE")) {
-        else if (recognisedPattern.equals("SLOPE")) {
 
-            return curvePattern;
-        } else if (recognisedPattern.equals("UNDEFINED")) {
-
-            return undefinedPattern;
-        }
-
-        System.out.println("Did not receive recognised pattern from server");
         return null;
+
     }
 }
