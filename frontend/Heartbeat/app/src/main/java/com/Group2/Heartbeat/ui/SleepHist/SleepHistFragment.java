@@ -1,5 +1,8 @@
 package com.Group2.Heartbeat.ui.SleepHist;
 
+import android.content.SharedPreferences;
+import android.graphics.DashPathEffect;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,10 +35,13 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import org.json.JSONObject;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
+import static android.content.Context.MODE_PRIVATE;
 import static android.graphics.Color.rgb;
 
 public class SleepHistFragment extends Fragment {
@@ -48,6 +54,10 @@ public class SleepHistFragment extends Fragment {
     private SleepHistViewModel sleepHistViewModel;
     private Gson gson = new Gson();
     TextView textView;
+    String welcomeMessage;
+    String username;
+    public static final String SHARED_PREFS = "sharedPrefs";
+    public static final String NAME = "name";
 
     GraphView graph;
 
@@ -59,6 +69,7 @@ public class SleepHistFragment extends Fragment {
         sleepHistViewModel =
                 new ViewModelProvider(this).get(SleepHistViewModel.class);
         View root = inflater.inflate(R.layout.fragment_sleephist, container, false);
+        TextView welcomeText = root.findViewById(R.id.welcomeText);
 
         sleepHistViewModel.latestSleepSession.observe(getViewLifecycleOwner(), new Observer<Integer>() {
             @Override
@@ -77,6 +88,7 @@ public class SleepHistFragment extends Fragment {
                 currDate = currDate.substring(0, currDate.length()-9);
                 textView.setText(currDate);
                 drawGraph();
+                welcomeText.setText(getSleepExplanation());
             }
         });
 
@@ -116,8 +128,13 @@ public class SleepHistFragment extends Fragment {
             }
         });
 
-
+        loadData();
         return root;
+    }
+
+    public void loadData() {
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        username = sharedPreferences.getString(NAME, "");
     }
 
     private String parseDate(LocalDate time) {
@@ -150,7 +167,44 @@ public class SleepHistFragment extends Fragment {
         gridLabel.setHumanRounding(true);
         graph.setVisibility(View.VISIBLE);
         graph.removeAllSeries();
+        Paint paint = new Paint();
+        paint.setColor(rgb(0,255,0));
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(10);
+        paint.setPathEffect(new DashPathEffect(new float[]{25, 35}, 0));
+
+        LineGraphSeries<DataPoint> idealPattern = new LineGraphSeries<DataPoint> (paintIdealPattern(nightResult.getShape()));
+        System.out.println(nightResult.getShape());
+
+        idealPattern.setCustomPaint(paint);
+
+        graph.addSeries(idealPattern);
         graph.addSeries(series);
+    }
+
+    public String getSleepExplanation(){
+
+        Log[] lastNightLogs = nightResult.getLogs();
+        LocalDateTime startOfSleep = toDateTime(lastNightLogs[0].getDate());
+        LocalDateTime endOfSleep = toDateTime(lastNightLogs[lastNightLogs.length - 1].getDate());
+
+        System.out.println(endOfSleep);
+        double hoursSlept = ChronoUnit.HOURS.between(startOfSleep, endOfSleep);
+
+        if (username.length() > 1) {
+
+            return  "Good Morning, " + username + ".\n\nYou slept for " + hoursSlept +
+                    " hours last night.\n\n You fell asleep at " +
+                    lastNightLogs[0].getDate().split("T")[1] + " and you woke up at "
+                    + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1];
+
+        }
+        else {
+
+            return  "Good Morning.\n\nYou slept for " + hoursSlept + " hours last night.\n\n You fell asleep at " +
+                    lastNightLogs[0].getDate().split("T")[1] + " and you woke up at "
+                    + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1];
+        }
     }
 
     /**
@@ -159,7 +213,7 @@ public class SleepHistFragment extends Fragment {
     private void getLatestSleepSession() {
         try {
             RequestQueue queue = Volley.newRequestQueue(getContext());
-            String url = "http://192.168.42.21:8080/logs/sleepsession/latest?userId=1";
+            String url = "http://192.168.56.1:8080/logs/sleepsession/latest?userId=1";
 
             // Request a string response from the provided URL.
             JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -189,6 +243,20 @@ public class SleepHistFragment extends Fragment {
     }
 
 
+    /**
+     * Converts Strings to LocalDateTime.
+     *
+     * @param stringStamp A string for each log which is provided by the server.
+     * @return Returns a  LocalDateTime which is formatted from the String provided.
+     */
+    public LocalDateTime toDateTime(String stringStamp){
+
+        String[] splitString = stringStamp.split("T");
+        String noTinString = splitString[0] + splitString[1];
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-ddHH:mm:ss");
+        LocalDateTime result = LocalDateTime.parse(noTinString, formatter);
+        return result;
+    }
 
     /**
      * Get the nightresult for a specific night. Currently hardcoded for user 1.
@@ -198,7 +266,7 @@ public class SleepHistFragment extends Fragment {
         try {
             // Instantiate the RequestQueue.
             RequestQueue queue = Volley.newRequestQueue(getContext());
-            String url = "http://192.168.42.21:8080/results/get/specific?userId=1&sleepsession=" + sleepSession;
+            String url = "http://192.168.56.1:8080/results/get/specific?userId=1&sleepsession=" + sleepSession;
 
             // Request a string response from the provided URL.
             JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -228,5 +296,85 @@ public class SleepHistFragment extends Fragment {
         } catch (Exception e) {
             System.out.println("error in getting nightresult: " + e.getLocalizedMessage());
         }
+    }
+
+    /**
+     *
+     * A method for returning datapoints to construct a painted line for the graph.
+     *
+     * @param recognisedPattern Pattern recognised by code and returned from server
+     * @return Returns the datapoints to be included in the painted line
+     */
+    public DataPoint[] paintIdealPattern(String recognisedPattern){
+
+        nightResult.getShape();
+        Log[] logs = nightResult.getLogs();
+
+        int quarterLog = logs.length / 4;
+        int middleLog = logs.length / 2;
+        int thirdQuarterLog = quarterLog * 3;
+
+        int i = 0;
+
+        DataPoint[] hillPattern = {
+                new DataPoint(0, 55),
+                new DataPoint((quarterLog / 2), (77 + 55) / 2),
+                new DataPoint(quarterLog, 77),
+                new DataPoint(((quarterLog + middleLog) / 2), (100 + 77) / 2),
+                new DataPoint(middleLog, 100),
+                new DataPoint(((middleLog + thirdQuarterLog) / 2), (100 + 46) / 2),
+                new DataPoint(thirdQuarterLog, 46),
+                new DataPoint(((thirdQuarterLog + logs.length) / 2), (100 + 46) / 2),
+                new DataPoint((logs.length - 1), 80)
+        };
+
+        DataPoint[] hammockPattern = {
+                new DataPoint(0, 85),
+                new DataPoint((quarterLog / 2), (60 + 85) / 2),
+                new DataPoint(quarterLog, 60),
+                new DataPoint(((quarterLog + middleLog) / 2), (60 + 40) / 2),
+                new DataPoint(middleLog, 40),
+                new DataPoint(((middleLog + thirdQuarterLog) / 2), (40 + 60) / 2),
+                new DataPoint(thirdQuarterLog, 60),
+                new DataPoint(((thirdQuarterLog + logs.length) / 2), (60 + 85) / 2),
+                new DataPoint((logs.length - 1), 85)
+        };
+
+        DataPoint[] curvePattern = {
+                new DataPoint(0, 120),
+                new DataPoint((quarterLog / 2), (120 + 100) / 2),
+                new DataPoint(quarterLog, 100),
+                new DataPoint(((quarterLog + middleLog) / 2), (100 + 85) / 2),
+                new DataPoint(middleLog, 85),
+                new DataPoint(((middleLog + thirdQuarterLog) / 2), (85 + 65) / 2),
+                new DataPoint(thirdQuarterLog, 65),
+                new DataPoint(((thirdQuarterLog + logs.length) / 2), (50 + 65) / 2),
+                new DataPoint((logs.length - 1), 50)
+        };
+
+        DataPoint[] undefinedPattern = {
+                new DataPoint(0, 0),
+        };
+
+
+        if (recognisedPattern.equals("HILL")){
+
+            return hillPattern;
+        }
+        else if (recognisedPattern.equals("HAMMOCK")){
+
+            return hammockPattern;
+        }
+        else if (recognisedPattern.equals("CURVE")) {
+
+            return curvePattern;
+        }
+        else if (recognisedPattern.equals("UNDEFINED")){
+
+            return hillPattern;
+        }
+
+        System.out.println("Did not receive recognised pattern from server");
+        return null;
     }
 }

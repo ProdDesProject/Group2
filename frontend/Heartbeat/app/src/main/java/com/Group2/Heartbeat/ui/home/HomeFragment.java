@@ -38,8 +38,6 @@ import org.json.JSONObject;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class HomeFragment extends Fragment {
@@ -47,7 +45,7 @@ public class HomeFragment extends Fragment {
     private HomeViewModel homeViewModel;
     int recognisedPattern;
     private Gson gson = new Gson();
-    String welcomemessage;
+    String welcomeMessage;
     String username;
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String NAME = "name";
@@ -100,13 +98,13 @@ public class HomeFragment extends Fragment {
                     paint.setStrokeWidth(10);
                     paint.setPathEffect(new DashPathEffect(new float[]{25, 35}, 0));
 
-                    LineGraphSeries<DataPoint> hammock = new LineGraphSeries<DataPoint> (paintIdealPattern(nightResult.getShape()));
+                    LineGraphSeries<DataPoint> idealPattern = new LineGraphSeries<DataPoint> (paintIdealPattern(nightResult.getShape()));
                     System.out.println(nightResult.getShape());
 
-                    hammock.setCustomPaint(paint);
+                    idealPattern.setCustomPaint(paint);
 
                     graph.addSeries(series);
-                    graph.addSeries(hammock);
+                    graph.addSeries(idealPattern);
 
                     Log[] lastNightLogs = nightResult.getLogs();
                     LocalDateTime startOfSleep = toDateTime(lastNightLogs[0].getDate());
@@ -115,9 +113,9 @@ public class HomeFragment extends Fragment {
                     System.out.println(endOfSleep);
                     double hoursSlept = ChronoUnit.HOURS.between(startOfSleep, endOfSleep);
 
-                    if (username.toString().length() > 1) {
+                    if (username.length() > 1) {
 
-                        welcomemessage =    "Good Morning, " + username.toString() + ".\n\nYou slept for " + hoursSlept +
+                        welcomeMessage =    "Good Morning, " + username + ".\n\nYou slept for " + hoursSlept +
                                             " hours last night.\n\n You fell asleep at " +
                                             lastNightLogs[0].getDate().split("T")[1] + " and you woke up at "
                                             + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1];
@@ -125,12 +123,12 @@ public class HomeFragment extends Fragment {
                     }
                     else {
 
-                        welcomemessage =    "Good Morning.\n\nYou slept for " + hoursSlept + " hours last night.\n\n You fell asleep at " +
+                        welcomeMessage =    "Good Morning.\n\nYou slept for " + hoursSlept + " hours last night.\n\n You fell asleep at " +
                                             lastNightLogs[0].getDate().split("T")[1] + " and you woke up at "
                                             + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1];
                     }
 
-                    welcomeText.setText(welcomemessage);
+                    welcomeText.setText(welcomeMessage);
                 }
             }
         });
@@ -264,7 +262,7 @@ public class HomeFragment extends Fragment {
 
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getContext());
-        String url = "http://192.168.42.21:8080/results/get/test";
+        String url = "http://192.168.56.1:8080/results/get/test";
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
