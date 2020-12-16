@@ -70,6 +70,8 @@ public class HomeFragment extends Fragment {
         final TextView textView2 = root.findViewById(R.id.textHomeMain);
         TextView welcomeText = root.findViewById(R.id.welcomeText);
 
+        homeViewModel.mainText.setValue("Last Night");
+
         homeViewModel.nightResult.observe(getViewLifecycleOwner(), new Observer<NightResult>() {
             @Override
             public void onChanged(@Nullable NightResult result) {

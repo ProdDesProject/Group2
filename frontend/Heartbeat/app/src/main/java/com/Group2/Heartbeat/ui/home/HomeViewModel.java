@@ -15,7 +15,6 @@ public class HomeViewModel extends ViewModel {
     public HomeViewModel() {
         mText = new MutableLiveData<>();
         mainText = new MutableLiveData<>();
-        //mText.setValue(MainActivity.getRestMessage());
         this.nightResult = new MutableLiveData<>();
     }
 }
