@@ -64,7 +64,7 @@ public class SleepHistFragment extends Fragment {
     Date[] dates;
     private SleepHistViewModel sleepHistViewModel;
     private final Gson gson = new Gson();
-    private final String URL = "http://192.168.56.1:8080";
+    private final String URL = "http://192.168.42.21:8080";
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {

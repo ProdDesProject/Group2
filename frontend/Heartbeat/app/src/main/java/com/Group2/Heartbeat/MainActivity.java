@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Create the necessary variables for posting
-        String URL = "http://192.168.56.1:8080";
+        String URL = "http://192.168.42.21:8080";
         String PostUrl = URL + "/logs/new/log";
         RequestQueue queue2 = Volley.newRequestQueue(MainActivity.this);
 
