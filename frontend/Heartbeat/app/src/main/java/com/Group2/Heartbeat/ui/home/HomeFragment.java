@@ -33,6 +33,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -40,7 +41,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.stream.IntStream;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.graphics.Color.rgb;
@@ -49,6 +49,8 @@ public class HomeFragment extends Fragment {
 
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String NAME = "name";
+    private final Gson gson = new Gson();
+    private final String URL = "http://192.168.42.21:8080";
     private String welcomeMessage;
     private String username;
     private String recognisedPattern;
@@ -56,9 +58,6 @@ public class HomeFragment extends Fragment {
     private GraphView graph;
     private Date[] dates;
     private HomeViewModel homeViewModel;
-    private final Gson gson = new Gson();
-    private final String URL = "http://192.168.42.21:8080";
-
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -149,7 +148,9 @@ public class HomeFragment extends Fragment {
                     LocalDateTime endOfSleep = toDateTime(lastNightLogs[lastNightLogs.length - 1].getDate());
 
                     System.out.println(endOfSleep);
-                    double hoursSlept = ChronoUnit.HOURS.between(startOfSleep, endOfSleep);
+                    double hoursSlept = ChronoUnit.MINUTES.between(startOfSleep, endOfSleep) / 60.0;
+                    DecimalFormat df = new DecimalFormat("#.##");
+                    df.format(hoursSlept);
 
                     welcomeMessage = getNightSummary(hoursSlept, lastNightLogs);
 
@@ -203,7 +204,7 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    public String getSleepImprovementRecommendations(String recognisedPattern){
+    public String getSleepImprovementRecommendations(String recognisedPattern) {
 
         switch (recognisedPattern) {
             case "HILL":

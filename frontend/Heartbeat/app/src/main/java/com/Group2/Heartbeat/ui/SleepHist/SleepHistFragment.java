@@ -35,6 +35,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -44,7 +45,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.stream.IntStream;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.graphics.Color.rgb;
@@ -53,6 +53,8 @@ public class SleepHistFragment extends Fragment {
 
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String NAME = "name";
+    private final Gson gson = new Gson();
+    private final String URL = "http://192.168.42.21:8080";
     int dateOffset = 0;
     int latestSleepSession = -1;
     NightResult nightResult;
@@ -63,8 +65,6 @@ public class SleepHistFragment extends Fragment {
     GraphView graph;
     Date[] dates;
     private SleepHistViewModel sleepHistViewModel;
-    private final Gson gson = new Gson();
-    private final String URL = "http://192.168.42.21:8080";
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -227,18 +227,21 @@ public class SleepHistFragment extends Fragment {
         LocalDateTime endOfSleep = toDateTime(lastNightLogs[lastNightLogs.length - 1].getDate());
 
         System.out.println(endOfSleep);
-        double hoursSlept = ChronoUnit.HOURS.between(startOfSleep, endOfSleep);
+        double hoursSlept = ChronoUnit.MINUTES.between(startOfSleep, endOfSleep) / 60.0;
+        System.out.println("hours: " + hoursSlept);
+        DecimalFormat df = new DecimalFormat("#.##");
+        df.format(hoursSlept);
 
         return getNightSummary(hoursSlept, lastNightLogs);
     }
 
-    public String getNightSummary(double hoursSlept, Log[] lastNightLogs){
+    public String getNightSummary(double hoursSlept, Log[] lastNightLogs) {
 
         String recognisedPattern = nightResult.getShape();
 
-        if (username.length() > 1){
+        if (username.length() > 1) {
 
-            return  "Good Morning, " + username + ".\n\nYou slept for " + hoursSlept +
+            return "Good Morning, " + username + ".\n\nYou slept for " + hoursSlept +
                     " hours last night.\nYou fell asleep at " +
                     lastNightLogs[0].getDate().split("T")[1] + " and woke at "
                     + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1]
@@ -248,7 +251,7 @@ public class SleepHistFragment extends Fragment {
 
         } else {
 
-            return  "Good Morning" + ".\n\nYou slept for " + hoursSlept +
+            return "Good Morning" + ".\n\nYou slept for " + hoursSlept +
                     " hours last night.\nYou fell asleep at " +
                     lastNightLogs[0].getDate().split("T")[1] + " and woke at "
                     + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1]
@@ -258,7 +261,7 @@ public class SleepHistFragment extends Fragment {
         }
     }
 
-    public String getSleepImprovementRecommendations(String recognisedPattern){
+    public String getSleepImprovementRecommendations(String recognisedPattern) {
 
         switch (recognisedPattern) {
             case "HILL":
