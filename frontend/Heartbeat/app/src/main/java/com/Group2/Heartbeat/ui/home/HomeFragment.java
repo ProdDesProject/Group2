@@ -292,7 +292,7 @@ public class HomeFragment extends Fragment {
                         new DataPoint(dates[((middleLog + thirdQuarterLog) / 2)], (85 + 65) / 2),
                         new DataPoint(dates[thirdQuarterLog], 65),
                         new DataPoint(dates[((thirdQuarterLog + logs.length) / 2)], (50 + 65) / 2),
-                        new DataPoint((logs.length - 1), 50)
+                        new DataPoint(dates[(logs.length - 1)], 50)
                 };
 
                 DataPoint[] undefinedPattern = {
@@ -300,18 +300,13 @@ public class HomeFragment extends Fragment {
                 };
 
 
-                if (recognisedPattern.equals("HILL")) {
-
-                    return hillPattern;
-                } else if (recognisedPattern.equals("HAMMOCK")) {
-
-                    return hammockPattern;
-                } else if (recognisedPattern.equals("CURVE")) {
-
-                    return curvePattern;
-                } else if (recognisedPattern.equals("UNDEFINED")) {
-
-                    return hillPattern;
+                switch (recognisedPattern) {
+                    case "HILL":
+                        return hillPattern;
+                    case "HAMMOCK":
+                        return hammockPattern;
+                    case "SLOPE":
+                        return curvePattern;
                 }
 
                 System.out.println("Did not receive recognised pattern from server");
