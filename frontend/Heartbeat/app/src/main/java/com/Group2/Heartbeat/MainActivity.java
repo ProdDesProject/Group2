@@ -2,26 +2,36 @@ package com.Group2.Heartbeat;
 
 import android.Manifest;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.navigation.NavigationView;
-
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
-import androidx.appcompat.app.AppCompatActivity;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import polar.com.sdk.api.PolarBleApi;
 import polar.com.sdk.api.PolarBleApiCallback;
@@ -29,26 +39,38 @@ import polar.com.sdk.api.PolarBleApiDefaultImpl;
 import polar.com.sdk.api.model.PolarDeviceInfo;
 import polar.com.sdk.api.model.PolarHrData;
 
+
 public class MainActivity extends AppCompatActivity {
 
-    private AppBarConfiguration mAppBarConfiguration;
-
-    private final static String TAG = MainActivity.class.getSimpleName();
-    PolarBleApi api;
-    String DEVICE_ID = "50924E2C";  //Note: SET OWN DEVICE ID OR USE SCAN FUNCTIONALITY
-    int heartRate = 0;
-
-    boolean isConnected;
-    boolean isConnecting;
-
-    String username;
-    String useremail;
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String NAME = "name";
     public static final String EMAIL = "email";
+    private final static String TAG = MainActivity.class.getSimpleName();
+    private static String restMessage = "";
+    PolarBleApi api;
+    String DEVICE_ID = "50924E2C";  //Note: SET OWN DEVICE ID OR USE SCAN FUNCTIONALITY
+    private AppBarConfiguration mAppBarConfiguration;
+    private int heartRate = 0;
+    private int timer;
+    private boolean isConnected;
+    private boolean isConnecting;
+    private String userName;
+    private String userEmail;
+    private final Gson gson = new Gson();
+
+    //gets static restMessage value
+    public static String getRestMessage() {
+        return restMessage;
+    }
+
+    //sets the static restMessage value
+    public static void setRestMessage(String restMessage) {
+        MainActivity.restMessage = restMessage;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -65,13 +87,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    // Log.d("MyApp", "api when pressing button: " + api.toString());
-                    // check connection state
                     if (!isConnected && !isConnecting) {
                         Snackbar.make(view, "Connecting...", Snackbar.LENGTH_LONG).show();
                         connect();
-                        fab.setImageResource(android.R.drawable.ic_input_delete);
-                    } else if (isConnected){
+                        fab.setImageResource(android.R.drawable.ic_delete);
+                    } else if (isConnected) {
                         Snackbar.make(view, "Disconnecting...", Snackbar.LENGTH_LONG).show();
                         disconnect();
                         fab.setImageResource(android.R.drawable.ic_input_add);
@@ -79,10 +99,15 @@ public class MainActivity extends AppCompatActivity {
                         Log.d("MyApp", "Still connecting, refusing connect or disconnect action... ");
                     }
                 } catch (Exception e) {
-                    Log.d("MyApp", "Exception caught: " + e );
+                    Log.d("MyApp", "Exception caught: " + e);
                 }
             }
         });
+
+        // Create the necessary variables for posting
+        String URL = "http://192.168.42.21:8080";
+        String PostUrl = URL + "/logs/new/log";
+        RequestQueue queue2 = Volley.newRequestQueue(MainActivity.this);
 
         api.setApiCallback(new PolarBleApiCallback() {
             @Override
@@ -121,12 +146,44 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("MyApp", "HR: " + data.hr);
                 heartRate = data.hr;
 
+                timer = timer + 1;
+
+                if (timer >= 5) {
+                    // Initialise the log to be sent
+                    JSONObject json = new JSONObject();
+                    LocalDateTime time = LocalDateTime.now();
+                    ZoneId zoneId = ZoneId.systemDefault(); // or: ZoneId.of("Europe/Oslo");
+                    long epoch = time.atZone(zoneId).toEpochSecond() * 1000;
+                    try {
+                        json.put("epochDate", epoch);
+                        json.put("heartRate", heartRate);
+                        json.put("userId", 0);
+                        json.put("sleepSession", 0);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println(json);
+
+                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, PostUrl, json, new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            System.out.println(response);
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            error.printStackTrace();
+                        }
+                    });
+
+                    queue2.add(jsonObjectRequest);
+                    timer = 0;
+                }
             }
         });
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            this.requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-        }
+        this.requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
 
         loadData();
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -143,9 +200,44 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navigationView, navController);
 
         TextView nav_header_title = headerView.findViewById(R.id.nav_header_title);
-        nav_header_title.setText(username);
+        nav_header_title.setText(userName);
         TextView nav_header_subtitle = headerView.findViewById(R.id.textView);
-        nav_header_subtitle.setText(useremail);
+        nav_header_subtitle.setText(userEmail);
+
+//        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
+
+        String url = URL + "/results/get/test";
+
+        // Request a string response from the provided URL.
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    // Display the first 500 characters of the response string.
+                    setRestMessage("Response is: " + response);
+                    System.out.println(response);
+
+                    NightResult nightResults = gson.fromJson(response.toString(), NightResult.class);
+
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                setRestMessage("That didn't work!");
+                error.printStackTrace();
+            }
+        });
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonRequest);
+
+
     }
 
     @Override
@@ -164,30 +256,30 @@ public class MainActivity extends AppCompatActivity {
 
     public void loadData() {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        username = sharedPreferences.getString(NAME, "");
-        useremail = sharedPreferences.getString(EMAIL, "");
+        userName = sharedPreferences.getString(NAME, "");
+        userEmail = sharedPreferences.getString(EMAIL, "");
     }
 
     public void connect() {
-        try{
+        try {
             api.connectToDevice(this.DEVICE_ID);
-        } catch(Exception e) {
-            Log.d("MyApp", "Exception caught: " + e );
+        } catch (Exception e) {
+            Log.d("MyApp", "Exception caught: " + e);
         }
     }
 
     public void disconnect() {
-        try{
+        try {
             api.disconnectFromDevice(this.DEVICE_ID);
-        } catch(Exception e) {
-            Log.d("MyApp", "Exception caught: " + e );
+        } catch (Exception e) {
+            Log.d("MyApp", "Exception caught: " + e);
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        if(requestCode == 1) {
-            Log.d(TAG,"bt ready");
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == 1) {
+            Log.d(TAG, "bt ready");
         }
     }
 
