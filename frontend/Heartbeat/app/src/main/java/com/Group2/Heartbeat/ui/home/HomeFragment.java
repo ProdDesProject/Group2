@@ -49,14 +49,16 @@ public class HomeFragment extends Fragment {
 
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String NAME = "name";
-    String welcomeMessage;
-    String username;
-    String recognisedPattern;
-    NightResult nightResult;
-    GraphView graph;
-    Date[] dates;
+    private String welcomeMessage;
+    private String username;
+    private String recognisedPattern;
+    private NightResult nightResult;
+    private GraphView graph;
+    private Date[] dates;
     private HomeViewModel homeViewModel;
-    private Gson gson = new Gson();
+    private final Gson gson = new Gson();
+    private final String URL = "http://192.168.42.21:8080";
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -71,8 +73,6 @@ public class HomeFragment extends Fragment {
         homeViewModel.nightResult.observe(getViewLifecycleOwner(), new Observer<NightResult>() {
             @Override
             public void onChanged(@Nullable NightResult result) {
-
-                System.out.println("onchange!!!!!!!!!!!!!!!!");
                 nightResult = result;
 
                 if (nightResult.getUserId() >= 0) {
@@ -81,24 +81,18 @@ public class HomeFragment extends Fragment {
                     Log[] logs = nightResult.getLogs();
                     dates = new Date[logs.length];
                     DataPoint[] dataPoints = new DataPoint[logs.length];
-                    IntStream.range(0, logs.length)
-                            .peek(i -> {
-                                if (logs[i].getHeartRate() > graphMaxY[0]) {
-                                    graphMaxY[0] = logs[i].getHeartRate();
-                                }
-                            })
-                            .peek(i -> {
-                                if (logs[i].getHeartRate() < graphMinY[0]) {
-                                    graphMinY[0] = logs[i].getHeartRate();
-                                }
-                            })
-
-                            .forEach(i -> {
-                                LocalDateTime time = toDateTime(logs[i].getDate());
-                                Date date = convertToDateViaInstant(time);
-                                dates[i] = date;
-                                dataPoints[i] = new DataPoint(date, logs[i].getHeartRate());
-                            });
+                    for (int i = 0; i < logs.length; i++) {
+                        if (logs[i].getHeartRate() > graphMaxY[0]) {
+                            graphMaxY[0] = logs[i].getHeartRate();
+                        }
+                        if (logs[i].getHeartRate() < graphMinY[0]) {
+                            graphMinY[0] = logs[i].getHeartRate();
+                        }
+                        LocalDateTime time = toDateTime(logs[i].getDate());
+                        Date date = convertToDateViaInstant(time);
+                        dates[i] = date;
+                        dataPoints[i] = new DataPoint(date, logs[i].getHeartRate());
+                    }
 
                     graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
                         @Override
@@ -107,7 +101,7 @@ public class HomeFragment extends Fragment {
                                 Format formatter = new SimpleDateFormat("HH:mm:ss");
                                 return formatter.format(value);
                             }
-                            return super.formatLabel(value, isValueX);
+                            return super.formatLabel(value, false);
                         }
                     });
                     graph.getGridLabelRenderer().setNumHorizontalLabels(5);
@@ -119,11 +113,9 @@ public class HomeFragment extends Fragment {
                     graph.getViewport().setYAxisBoundsManual(true);
 
 
-                    // set manual x bounds to have nice steps
                     graph.getViewport().setMinX(dates[0].getTime());
                     graph.getViewport().setMaxX(dates[dates.length - 1].getTime());
                     graph.getViewport().setXAxisBoundsManual(true);
-//                    graph.getViewport().setXAxisBoundsManual(true);
                     graph.getGridLabelRenderer().setPadding(40);
                     GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
                     gridLabel.setHorizontalAxisTitle("Time");
@@ -142,7 +134,7 @@ public class HomeFragment extends Fragment {
                     paint.setPathEffect(new DashPathEffect(new float[]{25, 35}, 0));
 
                     recognisedPattern = nightResult.getShape();
-                    LineGraphSeries<DataPoint> idealPattern = new LineGraphSeries<DataPoint> (paintIdealPattern(recognisedPattern));
+                    LineGraphSeries<DataPoint> idealPattern = new LineGraphSeries<DataPoint>(paintIdealPattern(recognisedPattern));
                     System.out.println(recognisedPattern);
 
                     idealPattern.setCustomPaint(paint);
@@ -153,20 +145,11 @@ public class HomeFragment extends Fragment {
                     Log[] lastNightLogs = nightResult.getLogs();
                     LocalDateTime startOfSleep = toDateTime(lastNightLogs[0].getDate());
                     LocalDateTime endOfSleep = toDateTime(lastNightLogs[lastNightLogs.length - 1].getDate());
-                    System.out.println(startOfSleep);
-                    System.out.println(endOfSleep);
 
                     System.out.println(endOfSleep);
                     double hoursSlept = ChronoUnit.HOURS.between(startOfSleep, endOfSleep);
 
-                    if (username.length() > 1) {
-
-                        welcomeMessage =    getNightSummary(hoursSlept, lastNightLogs);
-
-                    } else {
-
-                        welcomeMessage =    getNightSummary(hoursSlept, lastNightLogs);
-                    }
+                    welcomeMessage = getNightSummary(hoursSlept, lastNightLogs);
 
                     welcomeText.setText(welcomeMessage);
                 }
@@ -194,11 +177,11 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
-    public String getNightSummary(double hoursSlept, Log[] lastNightLogs){
+    public String getNightSummary(double hoursSlept, Log[] lastNightLogs) {
 
-        if (username.length() > 1){
+        if (username.length() > 1) {
 
-            return  "Good Morning, " + username + ".\n\nYou slept for " + hoursSlept +
+            return "Good Morning, " + username + ".\n\nYou slept for " + hoursSlept +
                     " hours last night.\nYou fell asleep at " +
                     lastNightLogs[0].getDate().split("T")[1] + " and woke at "
                     + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1]
@@ -208,7 +191,7 @@ public class HomeFragment extends Fragment {
 
         } else {
 
-            return  "Good Morning" + ".\n\nYou slept for " + hoursSlept +
+            return "Good Morning" + ".\n\nYou slept for " + hoursSlept +
                     " hours last night.\nYou fell asleep at " +
                     lastNightLogs[0].getDate().split("T")[1] + " and woke at "
                     + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1]
@@ -218,23 +201,20 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    public String getSleepImprovementRecommendations(String recognisedPattern){
+    public String getSleepImprovementRecommendations(String recognisedPattern) {
 
-        if(recognisedPattern.equals("HILL")){
-
-            return "hillRecommendations";
-        } else if (recognisedPattern.equals("HAMMOCK")){
-
-            return "hammockRecommendations";
-        } else if (recognisedPattern.equals("CURVE")){
-
-            return "curveRecommendations";
-        } else {
-
-            return "Beep boop";
+        switch (recognisedPattern) {
+            case "HILL":
+                return "hillRecommendations";
+            case "HAMMOCK":
+                return "hammockRecommendations";
+            case "CURVE":
+                return "curveRecommendations";
+            default:
+                return "Beep boop";
         }
     }
-    
+
     private Date convertToDateViaInstant(LocalDateTime dateToConvert) {
         return java.util.Date
                 .from(dateToConvert.atZone(ZoneId.systemDefault())
@@ -338,8 +318,7 @@ public class HomeFragment extends Fragment {
         String[] splitString = stringStamp.split("T");
         String noTinString = splitString[0] + splitString[1];
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-ddHH:mm:ss");
-        LocalDateTime result = LocalDateTime.parse(noTinString, formatter);
-        return result;
+        return LocalDateTime.parse(noTinString, formatter);
     }
 
 
@@ -347,7 +326,7 @@ public class HomeFragment extends Fragment {
 
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getContext());
-        String url = "http://192.168.42.21:8080/results/get/test";
+        String url = URL + "/results/get/test";
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {

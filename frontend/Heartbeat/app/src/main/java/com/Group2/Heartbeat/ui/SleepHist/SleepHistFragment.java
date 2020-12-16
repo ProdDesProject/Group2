@@ -59,12 +59,12 @@ public class SleepHistFragment extends Fragment {
     LocalDate time = LocalDate.now();
     String currDate;
     TextView textView;
-    String welcomeMessage;
     String username;
     GraphView graph;
     Date[] dates;
     private SleepHistViewModel sleepHistViewModel;
-    private Gson gson = new Gson();
+    private final Gson gson = new Gson();
+    private final String URL = "http://192.168.42.21:8080";
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -144,8 +144,7 @@ public class SleepHistFragment extends Fragment {
 
     private String parseDate(LocalDate time) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd'th' LLL yyyy");
-        String date = time.format(formatter);
-        return date;
+        return time.format(formatter);
     }
 
     private void drawGraph() {
@@ -154,23 +153,18 @@ public class SleepHistFragment extends Fragment {
         Log[] logs = nightResult.getLogs();
         dates = new Date[logs.length];
         DataPoint[] dataPoints = new DataPoint[logs.length];
-        IntStream.range(0, logs.length)
-                .peek(i -> {
-                    if (logs[i].getHeartRate() > graphMaxY[0]) {
-                        graphMaxY[0] = logs[i].getHeartRate();
-                    }
-                })
-                .peek(i -> {
-                    if (logs[i].getHeartRate() < graphMinY[0]) {
-                        graphMinY[0] = logs[i].getHeartRate();
-                    }
-                })
-                .forEach(i -> {
-                    LocalDateTime time = this.toDateTime(logs[i].getDate());
-                    Date date = convertToDateViaInstant(time);
-                    dates[i] = date;
-                    dataPoints[i] = new DataPoint(date, logs[i].getHeartRate());
-                });
+        for (int i = 0; i < logs.length; i++) {
+            if (logs[i].getHeartRate() > graphMaxY[0]) {
+                graphMaxY[0] = logs[i].getHeartRate();
+            }
+            if (logs[i].getHeartRate() < graphMinY[0]) {
+                graphMinY[0] = logs[i].getHeartRate();
+            }
+            LocalDateTime time = this.toDateTime(logs[i].getDate());
+            Date date = convertToDateViaInstant(time);
+            dates[i] = date;
+            dataPoints[i] = new DataPoint(date, logs[i].getHeartRate());
+        }
 
         graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
             @Override
@@ -179,7 +173,7 @@ public class SleepHistFragment extends Fragment {
                     Format formatter = new SimpleDateFormat("HH:mm:ss");
                     return formatter.format(value);
                 }
-                return super.formatLabel(value, isValueX);
+                return super.formatLabel(value, false);
             }
         });
         graph.getGridLabelRenderer().setNumHorizontalLabels(10); // only 4 because of the space
@@ -191,11 +185,9 @@ public class SleepHistFragment extends Fragment {
         graph.getViewport().setYAxisBoundsManual(true);
 
 
-        // set manual x bounds to have nice steps
         graph.getViewport().setMinX(dates[0].getTime());
         graph.getViewport().setMaxX(dates[dates.length - 1].getTime());
         graph.getViewport().setXAxisBoundsManual(true);
-//        graph.getViewport().setMinY(0);
         graph.getGridLabelRenderer().setPadding(40);
         GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
         gridLabel.setHorizontalAxisTitle("Time");
@@ -258,7 +250,7 @@ public class SleepHistFragment extends Fragment {
     private void getLatestSleepSession() {
         try {
             RequestQueue queue = Volley.newRequestQueue(getContext());
-            String url = "http://192.168.42.21:8080/logs/sleepsession/latest?userId=1";
+            String url = URL + "/logs/sleepsession/latest?userId=1";
 
             // Request a string response from the provided URL.
             JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -274,7 +266,6 @@ public class SleepHistFragment extends Fragment {
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-//                setRestMessage("That didn't work!");
                     error.printStackTrace();
                 }
 
@@ -299,8 +290,7 @@ public class SleepHistFragment extends Fragment {
         String[] splitString = stringStamp.split("T");
         String noTinString = splitString[0] + splitString[1];
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-ddHH:mm:ss");
-        LocalDateTime result = LocalDateTime.parse(noTinString, formatter);
-        return result;
+        return LocalDateTime.parse(noTinString, formatter);
     }
 
     /**
@@ -312,7 +302,7 @@ public class SleepHistFragment extends Fragment {
         try {
             // Instantiate the RequestQueue.
             RequestQueue queue = Volley.newRequestQueue(getContext());
-            String url = "http://192.168.42.21:8080/results/get/specific?userId=1&sleepsession=" + sleepSession;
+            String url = URL + "/results/get/specific?userId=1&sleepsession=" + sleepSession;
 
             // Request a string response from the provided URL.
             JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -332,7 +322,6 @@ public class SleepHistFragment extends Fragment {
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-//                setRestMessage("That didn't work!");
                     error.printStackTrace();
                 }
             });
@@ -353,7 +342,6 @@ public class SleepHistFragment extends Fragment {
     public DataPoint[] paintIdealPattern(String recognisedPattern) {
         try {
             if (dates.length > 0) {
-                nightResult.getShape();
                 Log[] logs = nightResult.getLogs();
 
                 int quarterLog = logs.length / 4;
@@ -395,10 +383,6 @@ public class SleepHistFragment extends Fragment {
                         new DataPoint(dates[thirdQuarterLog], 65),
                         new DataPoint(dates[((thirdQuarterLog + logs.length) / 2)], (50 + 65) / 2),
                         new DataPoint(dates[(logs.length - 1)], 50)
-                };
-
-                DataPoint[] undefinedPattern = {
-                        new DataPoint(dates[0], 0),
                 };
 
 
