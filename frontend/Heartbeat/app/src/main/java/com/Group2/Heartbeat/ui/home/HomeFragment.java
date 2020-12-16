@@ -203,7 +203,7 @@ public class HomeFragment extends Fragment {
                     lastNightLogs[0].getDate().split("T")[1] + " and woke at "
                     + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1]
                     + ".\n\nYour heart-rate pattern looks very similar to the "
-                    + recognisedPattern.toLowerCase() + " pattern.\n" +
+                    + recognisedPattern.toLowerCase() + " pattern (Represented by the dotted red line).\n" +
                     getSleepImprovementRecommendations(recognisedPattern);
 
         } else {
@@ -213,25 +213,31 @@ public class HomeFragment extends Fragment {
                     lastNightLogs[0].getDate().split("T")[1] + " and woke at "
                     + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1]
                     + ".\n\nYour heart-rate pattern looks very similar to the "
-                    + recognisedPattern.toLowerCase() + " pattern.\n" +
+                    + recognisedPattern.toLowerCase() + " pattern (Represented by the dotted red line).\n" +
                     getSleepImprovementRecommendations(recognisedPattern);
         }
     }
 
     public String getSleepImprovementRecommendations(String recognisedPattern){
 
-        if(recognisedPattern.equals("HILL")){
+        switch (recognisedPattern) {
+            case "HILL":
 
-            return "hillRecommendations";
-        } else if (recognisedPattern.equals("HAMMOCK")){
+                return "The hill signals exhaustion\n" +
+                        "It may occur if you go to bed outside of your ideal window." +
+                        "It may also occur as a result of snoring, which raises your heartrate.\n";
+            case "HAMMOCK":
 
-            return "hammockRecommendations";
-        } else if (recognisedPattern.equals("CURVE")){
+                return "Congratulations! This is an ideal heart rate pattern.\n" +
+                        "It represents a quality night's sleep.\nKeep up the great work!";
+            case "CURVE":
 
-            return "curveRecommendations";
-        } else {
+                return "This signals an overworked metabolism\n" +
+                        "Heart rate starts high and decreases until waking, meaning you can feel groggy in the morning." +
+                        "You can prevent this by not exercising or eating late at night\n";
+            default:
 
-            return "Beep boop";
+                return "Beep boop";
         }
     }
     
@@ -292,7 +298,7 @@ public class HomeFragment extends Fragment {
                         new DataPoint(dates[((middleLog + thirdQuarterLog) / 2)], (85 + 65) / 2),
                         new DataPoint(dates[thirdQuarterLog], 65),
                         new DataPoint(dates[((thirdQuarterLog + logs.length) / 2)], (50 + 65) / 2),
-                        new DataPoint((logs.length - 1), 50)
+                        new DataPoint(dates[(logs.length - 1)], 50)
                 };
 
                 DataPoint[] undefinedPattern = {
@@ -352,7 +358,7 @@ public class HomeFragment extends Fragment {
 
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getContext());
-        String url = "http://192.168.42.21:8080/results/get/test";
+        String url = "http://192.168.56.1:8080/results/get/test";
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {

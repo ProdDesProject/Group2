@@ -81,7 +81,7 @@ public class SleepHistFragment extends Fragment {
             public void onChanged(@Nullable Integer result) {
                 latestSleepSession = result;
                 System.out.println(("new sleepsession: " + latestSleepSession));
-                getNightResultForSleepsession(latestSleepSession);
+                getNightResultForSleepSession(latestSleepSession);
             }
         });
 
@@ -112,7 +112,7 @@ public class SleepHistFragment extends Fragment {
                     Snackbar.make(view, "No records for that date!", Snackbar.LENGTH_LONG).show();
                 } else {
                     dateOffset = dateOffset - 1;
-                    getNightResultForSleepsession(latestSleepSession + dateOffset);
+                    getNightResultForSleepSession(latestSleepSession + dateOffset);
                     System.out.println("dateoffset: " + dateOffset);
                 }
             }
@@ -126,7 +126,7 @@ public class SleepHistFragment extends Fragment {
                     Snackbar.make(view, "Cannot go into the future", Snackbar.LENGTH_LONG).show();
                 } else {
                     dateOffset = dateOffset + 1;
-                    getNightResultForSleepsession(latestSleepSession + dateOffset);
+                    getNightResultForSleepSession(latestSleepSession + dateOffset);
                     // VISUALIZE Data
                     System.out.println("dateoffset: " + dateOffset);
                 }
@@ -237,18 +237,55 @@ public class SleepHistFragment extends Fragment {
         System.out.println(endOfSleep);
         double hoursSlept = ChronoUnit.HOURS.between(startOfSleep, endOfSleep);
 
-        if (username.length() > 1) {
+        return getNightSummary(hoursSlept, lastNightLogs);
+    }
 
-            return "\nGood Morning, " + username + ".\n\nYou slept for " + hoursSlept +
-                    " hours last night.\n\n You fell asleep at " +
-                    lastNightLogs[0].getDate().split("T")[1] + " and you woke up at "
-                    + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1];
+    public String getNightSummary(double hoursSlept, Log[] lastNightLogs){
+
+        String recognisedPattern = nightResult.getShape();
+
+        if (username.length() > 1){
+
+            return  "Good Morning, " + username + ".\n\nYou slept for " + hoursSlept +
+                    " hours last night.\nYou fell asleep at " +
+                    lastNightLogs[0].getDate().split("T")[1] + " and woke at "
+                    + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1]
+                    + ".\n\nYour heart-rate pattern looks very similar to the "
+                    + recognisedPattern.toLowerCase() + " pattern (Represented by the dotted red line).\n" +
+                    getSleepImprovementRecommendations(recognisedPattern);
 
         } else {
 
-            return "\nGood Morning.\n\nYou slept for " + hoursSlept + " hours last night.\n\n You fell asleep at " +
-                    lastNightLogs[0].getDate().split("T")[1] + " and you woke up at "
-                    + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1];
+            return  "Good Morning" + ".\n\nYou slept for " + hoursSlept +
+                    " hours last night.\nYou fell asleep at " +
+                    lastNightLogs[0].getDate().split("T")[1] + " and woke at "
+                    + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1]
+                    + ".\n\nYour heart-rate pattern looks very similar to the "
+                    + recognisedPattern.toLowerCase() + " pattern (Represented by the dotted red line).\n" +
+                    getSleepImprovementRecommendations(recognisedPattern);
+        }
+    }
+
+    public String getSleepImprovementRecommendations(String recognisedPattern){
+
+        switch (recognisedPattern) {
+            case "HILL":
+
+                return "The hill signals exhaustion\n" +
+                        "It may occur if you go to bed outside of your ideal window." +
+                        "It may also occur as a result of snoring, which raises your heartrate.\n";
+            case "HAMMOCK":
+
+                return "Congratulations! This is an ideal heart rate pattern.\n" +
+                        "It represents a quality night's sleep.\nKeep up the great work!";
+            case "SLOPE":
+
+                return "This signals an overworked metabolism\n" +
+                        "Heart rate starts high and decreases until waking, meaning you can feel groggy in the morning." +
+                        "You can prevent this by not exercising or eating late at night\n";
+            default:
+
+                return "Beep boop";
         }
     }
 
@@ -258,7 +295,7 @@ public class SleepHistFragment extends Fragment {
     private void getLatestSleepSession() {
         try {
             RequestQueue queue = Volley.newRequestQueue(getContext());
-            String url = "http://192.168.42.21:8080/logs/sleepsession/latest?userId=1";
+            String url = "http://192.168.56.1:8080/logs/sleepsession/latest?userId=1";
 
             // Request a string response from the provided URL.
             JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -308,11 +345,11 @@ public class SleepHistFragment extends Fragment {
      *
      * @param sleepSession identifier for the night its representing.
      */
-    private void getNightResultForSleepsession(int sleepSession) {
+    private void getNightResultForSleepSession(int sleepSession) {
         try {
             // Instantiate the RequestQueue.
             RequestQueue queue = Volley.newRequestQueue(getContext());
-            String url = "http://192.168.42.21:8080/results/get/specific?userId=1&sleepsession=" + sleepSession;
+            String url = "http://192.168.56.1:8080/results/get/specific?userId=1&sleepsession=" + sleepSession;
 
             // Request a string response from the provided URL.
             JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -353,7 +390,6 @@ public class SleepHistFragment extends Fragment {
     public DataPoint[] paintIdealPattern(String recognisedPattern) {
         try {
             if (dates.length > 0) {
-                nightResult.getShape();
                 Log[] logs = nightResult.getLogs();
 
                 int quarterLog = logs.length / 4;
@@ -394,7 +430,7 @@ public class SleepHistFragment extends Fragment {
                         new DataPoint(dates[((middleLog + thirdQuarterLog) / 2)], (85 + 65) / 2),
                         new DataPoint(dates[thirdQuarterLog], 65),
                         new DataPoint(dates[((thirdQuarterLog + logs.length) / 2)], (50 + 65) / 2),
-                        new DataPoint((logs.length - 1), 50)
+                        new DataPoint(dates[(logs.length - 1)], 50)
                 };
 
                 DataPoint[] undefinedPattern = {
@@ -402,18 +438,19 @@ public class SleepHistFragment extends Fragment {
                 };
 
 
-                if (recognisedPattern.equals("HILL")) {
+                switch (recognisedPattern) {
+                    case "HILL":
 
-                    return hillPattern;
-                } else if (recognisedPattern.equals("HAMMOCK")) {
+                        return hillPattern;
+                    case "HAMMOCK":
 
-                    return hammockPattern;
-                } else if (recognisedPattern.equals("CURVE")) {
+                        return hammockPattern;
+                    case "SLOPE":
 
-                    return curvePattern;
-                } else if (recognisedPattern.equals("UNDEFINED")) {
+                        return curvePattern;
+                    case "UNDEFINED":
 
-                    return hillPattern;
+                        return undefinedPattern;
                 }
 
                 System.out.println("Did not receive recognised pattern from server");
