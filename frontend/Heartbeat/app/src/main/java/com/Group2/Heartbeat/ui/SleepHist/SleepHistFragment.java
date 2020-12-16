@@ -193,7 +193,7 @@ public class SleepHistFragment extends Fragment {
 
         if (username.length() > 1) {
 
-            return  "Good Morning, " + username + ".\n\nYou slept for " + hoursSlept +
+            return  "\nGood Morning, " + username + ".\n\nYou slept for " + hoursSlept +
                     " hours last night.\n\n You fell asleep at " +
                     lastNightLogs[0].getDate().split("T")[1] + " and you woke up at "
                     + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1];
@@ -201,7 +201,7 @@ public class SleepHistFragment extends Fragment {
         }
         else {
 
-            return  "Good Morning.\n\nYou slept for " + hoursSlept + " hours last night.\n\n You fell asleep at " +
+            return  "\nGood Morning.\n\nYou slept for " + hoursSlept + " hours last night.\n\n You fell asleep at " +
                     lastNightLogs[0].getDate().split("T")[1] + " and you woke up at "
                     + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1];
         }
@@ -371,7 +371,7 @@ public class SleepHistFragment extends Fragment {
         }
         else if (recognisedPattern.equals("UNDEFINED")){
 
-            return hillPattern;
+            return undefinedPattern;
         }
 
         System.out.println("Did not receive recognised pattern from server");

@@ -43,7 +43,7 @@ import java.util.stream.IntStream;
 public class HomeFragment extends Fragment {
 
     private HomeViewModel homeViewModel;
-    int recognisedPattern;
+    String recognisedPattern;
     private Gson gson = new Gson();
     String welcomeMessage;
     String username;
@@ -79,6 +79,8 @@ public class HomeFragment extends Fragment {
 
                     LineGraphSeries<DataPoint> series = new LineGraphSeries<>(dataPoints);
                     System.out.println("datapoints: " + dataPoints.length);
+                    int graphMaxX = dataPoints.length;
+                    graph.getViewport().setMaxX(graphMaxX);
                     graph.getViewport().setMaxY(graphMaxY[0]);
                     graph.getViewport().setMinY(0);
                     graph.getGridLabelRenderer().setPadding(40);
@@ -98,8 +100,9 @@ public class HomeFragment extends Fragment {
                     paint.setStrokeWidth(10);
                     paint.setPathEffect(new DashPathEffect(new float[]{25, 35}, 0));
 
-                    LineGraphSeries<DataPoint> idealPattern = new LineGraphSeries<DataPoint> (paintIdealPattern(nightResult.getShape()));
-                    System.out.println(nightResult.getShape());
+                    recognisedPattern = nightResult.getShape();
+                    LineGraphSeries<DataPoint> idealPattern = new LineGraphSeries<DataPoint> (paintIdealPattern(recognisedPattern));
+                    System.out.println(recognisedPattern);
 
                     idealPattern.setCustomPaint(paint);
 
@@ -109,23 +112,20 @@ public class HomeFragment extends Fragment {
                     Log[] lastNightLogs = nightResult.getLogs();
                     LocalDateTime startOfSleep = toDateTime(lastNightLogs[0].getDate());
                     LocalDateTime endOfSleep = toDateTime(lastNightLogs[lastNightLogs.length - 1].getDate());
+                    System.out.println(startOfSleep);
+                    System.out.println(endOfSleep);
 
                     System.out.println(endOfSleep);
                     double hoursSlept = ChronoUnit.HOURS.between(startOfSleep, endOfSleep);
 
                     if (username.length() > 1) {
 
-                        welcomeMessage =    "Good Morning, " + username + ".\n\nYou slept for " + hoursSlept +
-                                            " hours last night.\n\n You fell asleep at " +
-                                            lastNightLogs[0].getDate().split("T")[1] + " and you woke up at "
-                                            + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1];
+                        welcomeMessage =    getNightSummary(hoursSlept, lastNightLogs);
 
                     }
                     else {
 
-                        welcomeMessage =    "Good Morning.\n\nYou slept for " + hoursSlept + " hours last night.\n\n You fell asleep at " +
-                                            lastNightLogs[0].getDate().split("T")[1] + " and you woke up at "
-                                            + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1];
+                        welcomeMessage =    getNightSummary(hoursSlept, lastNightLogs);
                     }
 
                     welcomeText.setText(welcomeMessage);
@@ -152,6 +152,47 @@ public class HomeFragment extends Fragment {
         loadData();
 
         return root;
+    }
+
+    public String getNightSummary(double hoursSlept, Log[] lastNightLogs){
+
+        if (username.length() > 1){
+
+            return  "Good Morning, " + username + ".\n\nYou slept for " + hoursSlept +
+                    " hours last night.\nYou fell asleep at " +
+                    lastNightLogs[0].getDate().split("T")[1] + " and woke at "
+                    + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1]
+                    + ".\n\nYour heart-rate pattern looks very similar to the "
+                    + recognisedPattern.toLowerCase() + " pattern.\n" +
+                    getSleepImprovementRecommendations(recognisedPattern);
+
+        } else {
+
+            return  "Good Morning" + ".\n\nYou slept for " + hoursSlept +
+                    " hours last night.\nYou fell asleep at " +
+                    lastNightLogs[0].getDate().split("T")[1] + " and woke at "
+                    + lastNightLogs[lastNightLogs.length - 1].getDate().split("T")[1]
+                    + ".\n\nYour heart-rate pattern looks very similar to the "
+                    + recognisedPattern.toLowerCase() + " pattern.\n" +
+                    getSleepImprovementRecommendations(recognisedPattern);
+        }
+    }
+
+    public String getSleepImprovementRecommendations(String recognisedPattern){
+
+        if(recognisedPattern.equals("HILL")){
+
+            return "hillRecommendations";
+        } else if (recognisedPattern.equals("HAMMOCK")){
+
+            return "hammockRecommendations";
+        } else if (recognisedPattern.equals("CURVE")){
+
+            return "curveRecommendations";
+        } else {
+
+            return "Beep boop";
+        }
     }
 
 
