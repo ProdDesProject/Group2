@@ -45,12 +45,17 @@ public class HeartbeatApplication {
 				72, 73, 74, 77, 79, 76, 74, 73, 75, 73, 70, 68, 69, 70, 72, 70, 69, 65, 67, 70, 73, 72, 71, 72, 73, 74,
 				74, 73, 72, 70, 69, 68, 67, 69, 65, 67, 66, 63 };
 
+		exagerateGraph(arrHill);
+		exagerateGraph(arrHammock);
+		exagerateGraph(arrDownwardSlope);
+		exagerateGraph(arrDownwardSlope);
+
 		return args -> {
 			for (int i = 0; i < arrHill.length; i++) {
 				Log log = new Log();
 				log.setUserId(1L);
 				LocalDateTime time = LocalDateTime.of(2020, Month.NOVEMBER, 25, 2, 0, 0);
-				time = time.plusDays((long) i);
+				time = time.plusMinutes((long) i * 5);
 				log.setDate(time);
 				log.setHeartRate(arrHill[i]);
 				log.setSleepSession(1);
@@ -60,8 +65,8 @@ public class HeartbeatApplication {
 			for (int i = 0; i < arrHammock.length; i++) {
 				Log log = new Log();
 				log.setUserId(1L);
-				LocalDateTime time = LocalDateTime.of(2020, Month.NOVEMBER, 25, 2, 0, 0);
-				time = time.plusDays((long) i);
+				LocalDateTime time = LocalDateTime.of(2020, Month.NOVEMBER, 26, 2, 0, 0);
+				time = time.plusMinutes((long) i * 8);
 				log.setDate(time);
 				log.setHeartRate(arrHammock[i]);
 				log.setSleepSession(2);
@@ -71,8 +76,8 @@ public class HeartbeatApplication {
 			for (int i = 0; i < arrDownwardSlope.length; i++) {
 				Log log = new Log();
 				log.setUserId(1L);
-				LocalDateTime time = LocalDateTime.of(2020, Month.NOVEMBER, 25, 2, 0, 0);
-				time = time.plusDays((long) i);
+				LocalDateTime time = LocalDateTime.of(2020, Month.NOVEMBER, 27, 2, 0, 0);
+				time = time.plusMinutes((long) i * 6);
 				log.setDate(time);
 				log.setHeartRate(arrDownwardSlope[i]);
 				log.setSleepSession(3);
@@ -80,6 +85,29 @@ public class HeartbeatApplication {
 			}
 
 		};
+	}
+
+	private int[] exagerateGraph(int[] input) {
+		int avg = getAvg(input);
+
+		for (int i = 0; i < input.length; i++) {
+			int deviance = input[i] - avg;
+			int newI = input[i] + deviance;
+			input[i] = newI;
+		}
+
+		return input;
+	}
+
+	private int getAvg(int[] input) {
+		int total = 0;
+
+		for (int i = 0; i < input.length; i++) {
+			total = total + input[i];
+		}
+
+		double avg = ((double) total) / input.length;
+		return (int) Math.round(avg);
 	}
 
 }

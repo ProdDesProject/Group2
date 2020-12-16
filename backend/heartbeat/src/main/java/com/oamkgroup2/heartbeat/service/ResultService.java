@@ -39,6 +39,7 @@ public class ResultService {
             Log[] lastNight = this.logRepository.findAll().toArray(new Log[0]);
             result.setLogs(lastNight);
             result.setShape(HeartrateAnalyserHelper.checkShape(lastNight));
+            System.out.println("shape is: " + result.getShape());
 
             if (lastNight.length > 0) {
                 int year = lastNight[0].getDate().getYear();
@@ -61,7 +62,7 @@ public class ResultService {
      * @throws EntityNotFoundException
      */
     public NightResult getTestResult() throws EntityNotFoundException {
-        return this.getLatestResult(1);
+        return this.getSpecificResult(1, 1);
     }
 
     /**
@@ -76,8 +77,17 @@ public class ResultService {
             result.setShape(ShapeResult.UNDEFINED);
             Log[] lastNight = this.logRepository.findNightsByUserAndSleepSession(userId, sleepSession);
             result.setLogs(lastNight);
-            // TODO: analyze ShapeResult
+            result.setShape(HeartrateAnalyserHelper.checkShape(lastNight));
+
+            System.out.println("specific shape is: " + result.getShape());
             if (lastNight.length > 0) {
+                int year = lastNight[0].getDate().getYear();
+                Month month = lastNight[0].getDate().getMonth();
+                int day = lastNight[0].getDate().getDayOfMonth();
+                System.out.println("year" + year + "month" + month + "day" + day);
+                LocalDate date = LocalDate.of(year, month, day);
+                result.setNightStartDate(date);
+                System.out.println(("nightResult start date: " + result.getNightStartDate()));
                 return result;
             }
             throw new EntityNotFoundException(
