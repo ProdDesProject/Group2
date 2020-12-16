@@ -201,7 +201,6 @@ public class HomeFragment extends Fragment {
         }
     }
 
-<<<<<<< HEAD
     public String getSleepImprovementRecommendations(String recognisedPattern){
 
         switch (recognisedPattern) {
@@ -221,18 +220,6 @@ public class HomeFragment extends Fragment {
                         "You can prevent this by not exercising or eating late at night\n";
             default:
 
-=======
-    public String getSleepImprovementRecommendations(String recognisedPattern) {
-
-        switch (recognisedPattern) {
-            case "HILL":
-                return "hillRecommendations";
-            case "HAMMOCK":
-                return "hammockRecommendations";
-            case "CURVE":
-                return "curveRecommendations";
-            default:
->>>>>>> 9985cb6290649791f1e9d6b47ea96133fbfed656
                 return "Beep boop";
         }
     }
@@ -348,11 +335,7 @@ public class HomeFragment extends Fragment {
 
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getContext());
-<<<<<<< HEAD
-        String url = "http://192.168.56.1:8080/results/get/test";
-=======
         String url = URL + "/results/get/test";
->>>>>>> 9985cb6290649791f1e9d6b47ea96133fbfed656
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
